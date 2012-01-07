@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>SVG Maps</title>
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+        <!--[if lt IE 9]>
+          <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <!-- Le styles -->
+        <link rel="stylesheet" href="/climateweb/css/bootstrap.min.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/climateweb/js/raphael-min.js"></script>
+        <script type="text/javascript" src="/climateweb/js/svgmaps.js"></script>
+        <script type ="text/javascript">
+            $(document).ready(function(){
+                initRaphaels();
+                $('#makemaps').click(function(){
+                    drawMapsFromForm();
+                });
+                
+               drawMapsFromForm();
+
+                //                var testPath1 = "M 117.5 -87.5 L 117.5 -90 120 -90 120 -87.5 Z M 190 -85 L 190 -87.5 187.5 -87.5 187.5 -90 190 -90 192.5 -90 192.5 -87.5 192.5 -85 Z M 160 -107.5 L 160 -105 157.5 -105 155 -105 152.5 -105 150 -105 150 -102.5 147.5 -102.5 145 -102.5 142.5 -102.5 142.5 -100 140 -100 137.5 -100 135 -100 135 -97.5 132.5 -97.5 130 -97.5 127.5 -97.5 125 -97.5 125 -95 122.5 -95 120 -95 120 -92.5 117.5 -92.5 117.5 -95 117.5 -97.5 120 -97.5 120 -100 120 -102.5 122.5 -102.5 125 -102.5 125 -105 125 -107.5 125 -110 125 -112.5 127.5 -112.5 130 -112.5 132.5 -112.5 132.5 -110 135 -110 137.5 -110 137.5 -112.5 140 -112.5 142.5 -112.5 145 -112.5 145 -110 147.5 -110 147.5 -112.5 150 -112.5 152.5 -112.5 155 -112.5 157.5 -112.5 160 -112.5 162.5 -112.5 165 -112.5 167.5 -112.5 170 -112.5 170 -110 172.5 -110 172.5 -112.5 175 -112.5 177.5 -112.5 177.5 -110 180 -110 182.5 -110 185 -110 185 -107.5 185 -105 185 -102.5 185 -100 185 -97.5 185 -95 185 -92.5 182.5 -92.5 180 -92.5 180 -95 177.5 -95 177.5 -97.5 175 -97.5 175 -100 172.5 -100 172.5 -102.5 172.5 -105 170 -105 170 -107.5 167.5 -107.5 165 -107.5 162.5 -107.5 Z";
+                //                var testPath2 = "M 130 -30 L 130 -32.5 127.5 -32.5 127.5 -35 125 -35 125 -37.5 125 -40 122.5 -40 122.5 -42.5 120 -42.5 117.5 -42.5 117.5 -45 117.5 -47.5 117.5 -50 115 -50 115 -52.5 112.5 -52.5 112.5 -55 112.5 -57.5 112.5 -60 110 -60 110 -62.5 107.5 -62.5 107.5 -65 107.5 -67.5 110 -67.5 112.5 -67.5 112.5 -65 115 -65 115 -62.5 115 -60 117.5 -60 120 -60 122.5 -60 125 -60 127.5 -60 127.5 -62.5 127.5 -65 130 -65 132.5 -65 135 -65 137.5 -65 140 -65 142.5 -65 145 -65 147.5 -65 150 -65 152.5 -65 152.5 -67.5 152.5 -70 152.5 -72.5 155 -72.5 155 -70 157.5 -70 157.5 -72.5 157.5 -75 160 -75 160 -77.5 160 -80 162.5 -80 165 -80 167.5 -80 170 -80 170 -82.5 172.5 -82.5 175 -82.5 175 -80 177.5 -80 180 -80 182.5 -80 185 -80 185 -77.5 185 -75 185 -72.5 185 -70 182.5 -70 182.5 -67.5 182.5 -65 182.5 -62.5 180 -62.5 180 -60 177.5 -60 177.5 -57.5 177.5 -55 175 -55 172.5 -55 172.5 -52.5 172.5 -50 172.5 -47.5 170 -47.5 170 -45 172.5 -45 172.5 -42.5 170 -42.5 170 -40 170 -37.5 172.5 -37.5 172.5 -35 175 -35 175 -32.5 172.5 -32.5 172.5 -30 172.5 -27.5 175 -27.5 177.5 -27.5 180 -27.5 180 -25 180 -22.5 177.5 -22.5 175 -22.5 172.5 -22.5 172.5 -20 170 -20 170 -22.5 167.5 -22.5 165 -22.5 162.5 -22.5 160 -22.5 160 -20 162.5 -20 162.5 -17.5 160 -17.5 157.5 -17.5 157.5 -20 155 -20 155 -22.5 152.5 -22.5 150 -22.5 147.5 -22.5 147.5 -20 145 -20 142.5 -20 140 -20 140 -22.5 137.5 -22.5 135 -22.5 135 -25 135 -27.5 132.5 -27.5 132.5 -30 Z";
+                //                var testPath3 = "M 170 -20 L 170 -17.5 167.5 -17.5 165 -17.5 162.5 -17.5 162.5 -20 160 -20 160 -22.5 162.5 -22.5 165 -22.5 167.5 -22.5 170 -22.5 Z M 152.5 -15 L 152.5 -17.5 150 -17.5 150 -20 147.5 -20 147.5 -22.5 150 -22.5 152.5 -22.5 155 -22.5 155 -20 157.5 -20 157.5 -17.5 155 -17.5 155 -15 Z M 120 -40 L 120 -42.5 122.5 -42.5 122.5 -40 Z M 170 -45 L 170 -47.5 172.5 -47.5 172.5 -45 Z M 172.5 -52.5 L 172.5 -55 175 -55 175 -52.5 Z M 172.5 -27.5 L 172.5 -30 172.5 -32.5 175 -32.5 175 -30 177.5 -30 177.5 -27.5 175 -27.5 Z M 187.5 -87.5 L 190 -87.5 190 -85 187.5 -85 187.5 -82.5 185 -82.5 185 -80 182.5 -80 180 -80 177.5 -80 175 -80 175 -82.5 172.5 -82.5 170 -82.5 170 -80 167.5 -80 165 -80 162.5 -80 160 -80 160 -77.5 160 -75 157.5 -75 157.5 -72.5 157.5 -70 155 -70 155 -72.5 152.5 -72.5 152.5 -70 152.5 -67.5 152.5 -65 150 -65 147.5 -65 145 -65 142.5 -65 140 -65 137.5 -65 135 -65 132.5 -65 130 -65 127.5 -65 127.5 -62.5 127.5 -60 125 -60 122.5 -60 120 -60 117.5 -60 115 -60 115 -62.5 115 -65 112.5 -65 112.5 -67.5 110 -67.5 110 -70 110 -72.5 112.5 -72.5 112.5 -75 112.5 -77.5 115 -77.5 115 -80 117.5 -80 117.5 -82.5 117.5 -85 117.5 -87.5 120 -87.5 120 -90 117.5 -90 117.5 -92.5 120 -92.5 120 -95 122.5 -95 125 -95 125 -97.5 127.5 -97.5 130 -97.5 132.5 -97.5 135 -97.5 135 -100 137.5 -100 140 -100 142.5 -100 142.5 -102.5 145 -102.5 147.5 -102.5 150 -102.5 150 -105 152.5 -105 155 -105 157.5 -105 160 -105 160 -107.5 162.5 -107.5 165 -107.5 167.5 -107.5 170 -107.5 170 -105 172.5 -105 172.5 -102.5 172.5 -100 175 -100 175 -97.5 177.5 -97.5 177.5 -95 180 -95 180 -92.5 182.5 -92.5 185 -92.5 185 -95 185 -97.5 185 -100 187.5 -100 187.5 -97.5 187.5 -95 187.5 -92.5 190 -92.5 190 -90 187.5 -90 Z";
+                //                var paths = [];
+                //                var colors = ["#BDD7E7", "#6BAED6", "#2171B5" ]
+                //                paths[0] = testPath1; paths[1] = testPath2; paths[2] = testPath3;
+                //
+                //                var paper = Raphael(document.getElementById("map"));
+                //                var layers = paper.set();
+                //                for (var p in paths){
+                //                    var raphObj = paper.path(paths[p]);
+                //                    raphObj.attr({'stroke':colors[p]});
+                //                    raphObj.attr({'fill':colors[p]});
+                //                    layers.push(raphObj);
+                //                }
+                //                var x = layers.getBBox().x;
+                //                var y = layers.getBBox().y;
+                //                layers.translate((15 - x), 1 - y);
+               
+            });
+
+        </script>
+        <style type="text/css">
+            /* Override some defaults */
+            html, body {
+                background-color: #eee;
+            }
+            body {
+                padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
+            }
+            .container > footer p {
+                text-align: center; /* center align it with the container */
+            }
+            .container {
+                width: 820px; /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+            }
+
+            /* The white background content wrapper */
+            .content {
+                background-color: #fff;
+                padding: 20px;
+                margin: 0 -20px; /* negative indent the amount of the padding to maintain the grid system */
+                -webkit-border-radius: 0 0 6px 6px;
+                -moz-border-radius: 0 0 6px 6px;
+                border-radius: 0 0 6px 6px;
+                -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                box-shadow: 0 1px 2px rgba(0,0,0,.15);
+            }
+
+            /* Page header tweaks */
+            .page-header {
+                background-color: #f5f5f5;
+                padding: 20px 20px 10px;
+                margin: -20px -20px 20px;
+            }
+
+            /* Styles you shouldn't keep as they are for displaying this base example only */
+            .content .span10,
+
+
+            /* Give a quick and non-cross-browser friendly divider */
+/*            .content .span4 {
+                margin-left: 0;
+                padding-left: 19px;
+                border-left: 1px solid #eee;
+            }*/
+
+            .topbar .btn {
+                border: 0;
+            }
+
+        </style>
+        
+    </head>
+
+    <body>
+
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="#">SVG Maps</a>
+                    <ul class="nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="content">
+                <div class="page-header">
+                    <h1>Mozambique <small> Maps derived from 0.5 degree data</small></h1>
+                </div>
+                <div class ="row" style="border-bottom: 1px solid #DDD">
+                    <div class="span5">
+                        <h3>Compare models</h3>
+                        <p>Choose a country and a statistic from the form on the right. The maps below represent each models interpretation of the data</p>
+                        <div class ="clearfix" style="margin-top:70px">
+                        </div>
+
+                    </div>
+
+                    <form action class="form-stacked">
+
+                        <div class="span6 offset3">
+
+                            <h4>Choose a configuration</h4>
+
+                            <div class ="clearfix">
+                                <label for="countrySelect">Country</label>
+                                <div class="input">
+                                    <select class="medium"  id="countrySelect">
+                                        <option value="MOZ">Mozambique</option>
+                                        <option value="ETH">Ethiopia</option>
+                                        <option value="SDN">Sudan</option>
+                                        <option value="SOM">Somalia</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="clearfix">
+                                <label for="varSelect">Variable</label>
+                                <div class="input">
+                                    <select class="small"  id="varSelect">
+                                        <option>txx</option>
+                                        <option>tnn</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class = "clearfix">
+                                
+                                <label for="scenarioSelect"> <span>i</span> Scenario</label>
+                                <div class="input">
+                                    <select class="small"  id="scenarioSelect">
+                                        <option>a2</option>
+                                        <option>a1b</option>
+                                        <option>b1</option>
+                                    </select>
+                                    <button type="button" id="makemaps" class="btn primary" style="margin-left:80px" >Make maps</button>
+                                    <button type="button" class="btn default" style="margin-left:8px">Hide</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="span4 " style="height:200px">
+                        <h4>GFDL-CM2.1</h4>
+                        <div id ="gfdl_cm2_1">
+
+                        </div>
+
+                    </div>
+                    <div class="span4 " style="height:200px">
+                        <h4>CNRM-CM3</h4>
+                        <div id="cnrm_cm3">
+
+                        </div>
+                    </div>
+                    <div class="span4 " style="height:200px">
+                        <h4>GFDL-CM2.0</h4>
+                        <div id ="gfdl_cm2_0" >
+
+                        </div>
+                    </div>
+                    <div class="span1 " style="height:200px">
+                        loading
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="span4 " style="height:200px">
+                        <h4>MIROC3.2</h4>
+                        <div id ="miroc3_2_medres"   >
+
+                        </div>
+
+                    </div>
+                    <div class="span4 " style="height:200px">
+                       
+                    </div>
+                    <div class="span4 " style="height:200px">
+                       
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            <footer>
+                <p>SDNIS World Bank</p>
+            </footer>
+
+        </div> <!-- /container -->
+
+    </body>
+</html>

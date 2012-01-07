@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>API Docs</title>
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+        <!--[if lt IE 9]>
+          <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <!-- Le styles -->
+        <!--link rel="stylesheet" href="/climateweb/css/bootstrap.min.css"-->
+        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://raw.github.com/DmitryBaranovskiy/raphael/master/raphael-min.js"></script>
+
+        <script type="text/javascript" src="/climateweb/apidoc/demos/js/allthecalls.js"></script>
+
+
+
+        <style type="text/css">
+
+            /* Override some defaults */
+            html, body {
+                background-color: #eee;
+            }
+            body {
+                padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
+            }
+            .container > footer p {
+                text-align: center; /* center align it with the container */
+            }
+            .container {
+                width: 820px; /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+            }
+            .dlcsv, .dljson, .dlxml {
+                cursor:pointer; /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+            }
+
+            /* The white background content wrapper */
+            .content {
+                background-color: #fff;
+                padding: 20px;
+                margin: 0 -20px; /* negative indent the amount of the padding to maintain the grid system */
+                -webkit-border-radius: 0 0 6px 6px;
+                -moz-border-radius: 0 0 6px 6px;
+                border-radius: 0 0 6px 6px;
+                -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                box-shadow: 0 1px 2px rgba(0,0,0,.15);
+            }
+
+            /* Page header tweaks 
+            .page-header {
+                background-color: #f5f5f5;
+                padding: 20px 20px 10px;
+                margin: -20px -20px 20px;
+            }
+            */
+            /* Styles you shouldn't keep as they are for displaying this base example only */
+            .content .span10,
+
+
+            /* Give a quick and non-cross-browser friendly divider */
+            /*            .content .span4 {
+                            margin-left: 0;
+                            padding-left: 19px;
+                            border-left: 1px solid #eee;
+                        }*/
+
+            .topbar .btn {
+                border: 0;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="#">Climate Data API</a>
+                    <ul class="nav">
+                        <li class="active"><a id="showtop"href="#" style="display:none">Show</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container">
+
+
+
+            <div class="content" style="padding-top: 0px">
+
+                <div id="topthing" class ="row" style="background-color: #ffffff; position: fixed; z-index: 100">
+                    <div class="page-header"  style=" margin-top:10px; background-color: #ffffff; ">
+                        <h1>Charts and Tables <small> Derived from 2 degree data</small></h1>
+                    </div>
+                    <div class="span8">
+                        <!--<h3 style="color:#808080">select a country  <span id="titlecountry"></span></h3>
+                        div id="map_canvas">Choose a
+
+                        </div -->
+                        <div id="testmap" class="span13 " style="margin-top: 50px; height:300px; width:550px">
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="span4 offset2">
+                        <form action class="form-stacked">
+
+
+
+                            <!-- <h4 style="color:#3366FF">Config for <span id="configcountry">country</span></h4>
+
+                            div class="clearfix">
+                                <label>Country</label>
+                                <div class="input">
+                                    <span id="chosenIso" class="uneditable-input"></span>
+                                </div>
+                            </div-->
+
+                            <div class = "clearfix" style="height:55px">
+
+                                <label for="typeselect"> Stat Type</label>
+                                <div class="input">
+                                    <select class="small"  id="stattype">
+                                        <option id="meantype" value="mavg">mean</option>
+                                        <option id="anomtype" value="manom">change</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <label for="gcmSelect">GCM</label>
+                                <div class="input">
+                                    <select class="medium"  id="gcmSelect">
+                                        <option>bccr_bcm2_0</option>
+                                        <option>csiro_mk3_5</option>
+                                        <option>ingv_echam4</option>
+                                        <option>cccma_cgcm3_1</option>
+                                        <option>cnrm_cm3</option>
+                                        <option>gfdl_cm2_0</option>
+                                        <option>gfdl_cm2_1</option>
+                                        <option>ipsl_cm4</option>
+                                        <option>miroc3_2_medres</option>
+                                        <option>miub_echo_g</option>
+                                        <option>mpi_echam5</option>
+                                        <option>mri_cgcm2_3_2a</option>
+                                        <option>inmcm3_0</option>
+                                        <option>ukmo_hadcm3</option>
+                                        <option>ukmo_hadgem1</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="clearfix">
+                                <label for="varSelect">Variable</label>
+                                <div class="input">
+                                    <select class="small"  id="varSelect">
+                                        <option>tas</option>
+                                        <option>pr</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class = "clearfix" style="height:55px">
+
+                                <label id="scenariolabel" for="scenarioSelect">  Scenario</label>
+                                <div class="input">
+                                    <select class="small"  id="scenarioSelect">
+                                        <option>a2</option>
+                                        <option>b1</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class = "clearfix">
+
+                                <label for="yearsSelect">  Time Period</label>
+                                <div class="input">
+                                    <select class="medium"  id="yearsSelect">
+                                        <option>1920 - 1939</option>
+                                        <option>1940 - 1959</option>
+                                        <option>1960 - 1979</option>
+                                        <option>1980 - 1999</option>
+                                        <option selected ="true">2020 - 2039</option>
+                                        <option>2040 - 2059</option>
+                                        <option>2060 - 2079</option>
+                                        <option>2080 - 2099</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <button type="button" id="showdata" class="btn primary" style="margin-left:2px" >Hide</button>
+                            <button type="button" id="downloaddata" class="btn default" style="margin-left:2px" >Download</button>
+
+
+
+                        </form>
+                    </div>
+                </div>
+                <br/>
+                <div class ="row">
+                    <div class =" span4 offset11" style="border-color:#dddddd; border-width: 1px; border-style: solid;padding:4px; background:whitesmoke; position:fixed; margin-top:30px;  width:100px">
+
+                        <p><a href="#gcm">GCM </a></p>
+                        <p><a href="#ensemble">Ensemble </a></p>
+                        <p><a href="#cru">CRU </a></p>
+
+
+                    </div>
+                </div>
+                <a name="gcm"></a>
+                <div id="callheader" class="page-header" >
+                    <h1>API Calls <small>Example requests for the climate data API</small></h1>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="span13 " >
+                        <h3>Precipitation data for a specific model and scenario</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9 ">
+
+                        <div>
+                            <pre>/v1/country/mavg/bccr_bcm2_0/a2/pr/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9 ">
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Model</td><td>bccr_bcm2_0</td></tr>
+                                <tr><td>Scenario</td><td>a2</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="row" style="margin-top:30px">
+                    <div class="span13 " >
+                        <h3>Precipitation and temperature data for a specific model and scenario</h3>
+                    </div>
+
+                </div>
+
+                <div class="row" >
+                    <div class="span9 ">
+
+                        <div>
+                            <pre>/v1/country/mavg/bccr_bcm2_0/a2/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9 ">
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Model</td><td>bccr_bcm2_0</td></tr>
+                                <tr><td>Scenario</td><td>a2</td></tr>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+                <div class="row" style="margin-top:30px">
+                    <div class="span13 " >
+                        <h3>Precipitation data for a specific model</h3>
+
+                    </div>
+
+                </div>
+
+                <div class="row" >
+                    <div class="span9 ">
+
+                        <div>
+                            <pre>/v1/country/mavg/bccr_bcm2_0/pr/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class ="row">
+                    <div class="span9 ">
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Model</td><td>bccr_bcm2_0</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="row" style="margin-top:30px">
+                    <div class="span13 " >
+                        <h3>Precipitation data for a specific scenario</h3>
+
+                    </div>
+
+                </div>
+
+                <div class="row" >
+                    <div class="span9 ">
+
+                        <div>
+                            <pre>/v1/country/mavg/a2/pr/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class ="row">
+                    <div class="span9 ">
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Scenario</td><td>a2</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="row" style="margin-top:30px">
+                    <div class="span13 " >
+                        <h3>Precipitation data for all models and scenarios</h3>
+
+                    </div>
+
+                </div>
+                <div class="row" >
+                    <div class="span9 ">
+
+                        <div>
+                            <pre>/v1/country/mavg/pr/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class ="row">
+                    <div class="span9 ">
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </div>
+
+
+
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Temperature and precipitation data for a specific model</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/bccr_bcm2_0/2040/2059/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Projected data for precipitation</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/pr/projection/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a name="ensemble"></a>
+                </div>
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Ensemble precip data for a specific percentile and scenario</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/ensemble/a2/10/pr/2020/2039/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                                <tr><td>Scenario</td><td>a2</td></tr>
+                                <tr><td>Percentile</td><td>10</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Ensemble precip data for a specific scenario</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/ensemble/a2/pr/2020/2039/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                                <tr><td>Scenario</td><td>a2</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Ensemble precip data for a specific percentile</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/ensemble/10/pr/2020/2039/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                                <tr><td>Percentile</td><td>10</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Ensemble precip data for a all scenarios and percentiles</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/ensemble/pr/2020/2039/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>From Year</td><td>2020</td></tr>
+                                <tr><td>To Year</td><td>2039</td></tr>
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>Ensemble precip projection</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/mavg/ensemble/pr/projection/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>pr</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <a name="cru"></a>
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>CRU decade averages</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/cru/tas/decade/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>CRU yearly averages</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/cru/tas/year/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row" style="margin-top:40px">
+                    <div class="span13 " >
+                        <h3>CRU monthly averages</h3>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="span9">
+
+                        <div>
+                            <pre>/v1/country/cru/tas/month/rwa</pre>
+                            <p><span class="label dlcsv">csv</span> <span class="label dljson">json</span> <span class="label dlxml">xml</span></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class ="row">
+                    <div class="span9" >
+                        <table class ="condensed-table zebra-striped bordered-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Location</td><td>moz</td></tr>
+                                <tr><td>Variable</td><td>tas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+            <footer>
+                <p>SDNIS World Bank</p>
+            </footer>
+
+        </div> <!-- /container -->
+
+    </body>
+</html>
