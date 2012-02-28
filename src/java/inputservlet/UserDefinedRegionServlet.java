@@ -39,7 +39,7 @@ public class UserDefinedRegionServlet extends HttpServlet {
         String userRegion = request.getParameter("region");
 
         UserDefinedRegionService service = UserDefinedRegionService.get();
-        double[][] points = service.converCsvLonLatToGeom(userRegion); // should be five points
+        double[][] points = service.convertPointStringToArray(userRegion); // should be five points
         List<Point> pointList = service.convertArrayToGeometry(points);
         Polygon poly = GeometryBuilder.createPolygonFromCoordList(pointList);
 
@@ -47,7 +47,7 @@ public class UserDefinedRegionServlet extends HttpServlet {
 //        List<GridCell> cells = shapeFileFilter.readShapeFileForAnnualData("/data/GCM_2deg/GCM/GCM_long_clim_monthly.shp/GCM_long_clim_monthly.shp/bccr_bcm2_0/pcmdi_long_clim_annual.bccr_bcm2_0.pr_20c3m.1920-1939.shp", poly);
         List<GridCell> cells = shapeFileFilter.readShapeFileForAnnualData("C:\\Users\\wb385924\\OLD_CLIMATE_DATA\\GCM\\GCM_long_clim_annual.shp\\GCM_long_clim_annual.shp\\bccr_bcm2_0\\pcmdi_long_clim_annual.bccr_bcm2_0.pr_20c3m.1920-1939.shp", poly);
 //        new File()
-        new CellMapMaker().drawToStream(cells, response.getOutputStream());
+        new CellMapMaker().drawToStream(cells, response.getOutputStream(), poly);
         String rootPath = getServletContext().getRealPath("/userimages/");
         response.flushBuffer();
         

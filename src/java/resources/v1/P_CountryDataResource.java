@@ -6,6 +6,9 @@ package resources.v1;
 
 import com.google.gson.Gson;
 import com.sun.jersey.spi.resource.Singleton;
+import dao.GeoDao;
+import database.DBUtils;
+import java.sql.Connection;
 import java.util.HashMap;
 
 import java.util.logging.Logger;
@@ -29,11 +32,48 @@ import service.WebService.Delivery;
  *
  * @author wb385924
  */
+
+
+
 @Singleton
 @Path("/v1/country")
 public class P_CountryDataResource {
 
+    
     private static final Logger log = Logger.getLogger(P_CountryDataResource.class.getName());
+
+    @GET
+    @Path("/bbox/kml/{iso3:\\w{3}}")
+    @Produces(RequestUtil.APP_KML)
+    public String getBboxKmlCountryBoundary(@PathParam("iso3") String iso3) {
+        int countryId = -1;
+        if (iso3 != null && iso3.trim().length() == 3) {
+            Connection c = DBUtils.getConnection();
+            try {
+                countryId = CountryService.get().getId(iso3);
+                String kml = GeoDao.getGeometryBboxAsKML(c, "boundary", "shape", "area_id", countryId);
+                return kml;
+            } finally {
+                DBUtils.close(c);
+            }
+        }
+        return "<kml></kml>";
+    }
+
+
+
+
+    @GET
+    // The Java method will produce content identified by the MIME Media
+    // type "text/plain"
+    @Produces("application/json")
+    public String getClichedMessage() {
+
+        return new Gson().toJson(CountryService.get().getCountries());
+
+    }
+
+    
 
     @GET
     @Path("/{tempagg}/{gcm:\\w{8,15}}/{scenario:(?i)(20c3m|a2|b1)}/{stat}/{fyear}/{tyear}/{longitude},{latitude}")
@@ -47,7 +87,7 @@ public class P_CountryDataResource {
             @PathParam("tyear") int tyear,
             @PathParam("latitude") double latitude,
             @PathParam("longitude") double longitude) {
-            log.info("getting lat lon data");
+        log.info("getting lat lon data");
         int countryId = DerivedStatsService.get().getCountryId(latitude, longitude);
         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
 
@@ -65,6 +105,104 @@ public class P_CountryDataResource {
         Gson gson = new Gson();
         return gson.toJson(data);
 
+    }
+
+   
+
+    @GET
+    @Path("/kml/{threshold}/{iso3}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlSimplifiedBoundary(@PathParam("iso3") String iso3, @PathParam("threshold") double threshold) {
+        int countryId = -1;
+        if (iso3 != null && iso3.trim().length() == 3) {
+            Connection c = DBUtils.getConnection();
+            try {
+                countryId = CountryService.get().getId(iso3);
+                String kml = GeoDao.getSimplifiedGeometryAsKML(c, "boundary", "shape", "area_id", countryId, threshold);
+                StringBuilder sb = new StringBuilder();
+                sb.append("<kml><Document><Placemark>");
+                sb.append("<name>");
+                sb.append(iso3);
+                sb.append("</name>");
+                sb.append(kml);
+                sb.append("</Placemark></Document></kml>");
+                return sb.toString();
+            } finally {
+                DBUtils.close(c);
+            }
+        }
+        return "<kml></kml>";
+    }
+
+    @GET
+    @Path("/kml/{iso3}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlCountryBoundary(@PathParam("iso3") String iso3) {
+        int countryId = -1;
+        if (iso3 != null && iso3.trim().length() == 3) {
+            Connection c = DBUtils.getConnection();
+            try {
+                countryId = CountryService.get().getId(iso3);
+                String kml = GeoDao.getGeometryAsKML(c, "boundary", "shape", "area_id", countryId);
+                StringBuilder sb = new StringBuilder();
+                sb.append("<kml><Document><Placemark>");
+                sb.append("<name>");
+                sb.append(iso3);
+                sb.append("</name>");
+                sb.append(kml);
+                sb.append("</Placemark></Document></kml>");
+                return sb.toString();
+            } finally {
+                DBUtils.close(c);
+            }
+        }
+        return "<kml></kml>";
+    }
+
+    @GET
+    @Path("/kmlpart/{iso3}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getKmlPartBoundary(@PathParam("iso3") String iso3) {
+        int countryId = -1;
+        if (iso3 != null && iso3.trim().length() == 3) {
+            Connection c = DBUtils.getConnection();
+            try {
+                countryId = CountryService.get().getId(iso3);
+                String kml = GeoDao.getGeometryAsKML(c, "boundary", "shape", "area_id", countryId);
+                StringBuilder sb = new StringBuilder();
+//                sb.append("<name>");
+//                sb.append(iso3);
+//                sb.append("</name>");
+                sb.append(kml);
+                return sb.toString();
+            } finally {
+                DBUtils.close(c);
+            }
+        }
+        return "<kml></kml>";
+    }
+
+    @GET
+    @Path("/kmlpart/{threshold}/{iso3}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getKmlPartSimplifiedBoundary(@PathParam("iso3") String iso3, @PathParam("threshold") double threshold) {
+        int countryId = -1;
+        if (iso3 != null && iso3.trim().length() == 3) {
+            Connection c = DBUtils.getConnection();
+            try {
+                countryId = CountryService.get().getId(iso3);
+                String kml = GeoDao.getSimplifiedGeometryAsKML(c, "boundary", "shape", "area_id", countryId, threshold);
+                StringBuilder sb = new StringBuilder();
+//                sb.append("<name>");
+//                sb.append(iso3);
+//                sb.append("</name>");
+                sb.append(kml);
+                return sb.toString();
+            } finally {
+                DBUtils.close(c);
+            }
+        }
+        return "<kml></kml>";
     }
 
     // ================= gcm scneario all vars =======================
@@ -87,10 +225,10 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmScenarioAllVariables(gcmName, scenarioName,  fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.WEB);
+        return WebService.get().getGcmScenarioAllVariables(gcmName, scenarioName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
-     // ================= download gcm scneario all vars =======================
+    // ================= download gcm scneario all vars =======================
     @GET
     @Path("/dl/{tempagg}/{gcm:\\w{8,15}}/{scenario:(?i)(20c3m|a2|b1)}/{fyear}/{tyear}/{iso3}")
     public Response downloadGcmScenarioAllVars(
@@ -110,10 +248,10 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmScenarioAllVariables(gcmName, scenarioName,  fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getGcmScenarioAllVariables(gcmName, scenarioName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
 
- // ================= gcm all vars =======================
+    // ================= gcm all vars =======================
     @GET
     @Path("/{tempagg}/{gcm:\\w{8,15}}/{fyear}/{tyear}/{iso3}")
     public Response getGcmAllVars(
@@ -132,7 +270,7 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmAllVariables(gcmName,   fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.WEB);
+        return WebService.get().getGcmAllVariables(gcmName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
     // ================= download gcm all vars =======================
@@ -154,10 +292,8 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmAllVariables(gcmName,   fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getGcmAllVariables(gcmName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
-
-
 
     // ================= gcm and scenario single var =======================
     @GET
@@ -180,7 +316,7 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmScenario(gcmName, scenarioName, statName, fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.WEB);
+        return WebService.get().getGcmScenario(gcmName, scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
     // =================  download gcm and scenario single var =======================
@@ -203,13 +339,10 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getGcmScenario(gcmName, scenarioName, statName, fyear, tyear, countryId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(iso3),mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getGcmScenario(gcmName, scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(iso3), mediaType, Delivery.DOWNLOAD);
     }
 
-
-
-
-     // ===================== scenario single var  ============================//
+    // ===================== scenario single var  ============================//
     @GET
     @Path("/{tempagg}/{scenario:(?i)(20c3m|a2|b1)}/{stat}/{fyear}/{tyear}/{iso3}")
     public Response getScenarioData(
@@ -219,7 +352,7 @@ public class P_CountryDataResource {
             @PathParam("fyear") int fyear,
             @PathParam("tyear") int tyear,
             @PathParam("iso3") String iso3) {
-            log.info("getting single scenario ");
+        log.info("getting single scenario ");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -229,7 +362,6 @@ public class P_CountryDataResource {
 
         return WebService.get().getSingleScenarioData(scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, WebService.Delivery.WEB);//getScenarioDataDelegate(scenarioName, statName, fyear, tyear, iso3, mediaType);
     }
-
 
     // ===================== download scenario single var ============================//
     @GET
@@ -252,8 +384,7 @@ public class P_CountryDataResource {
         return WebService.get().getSingleScenarioData(scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, WebService.Delivery.DOWNLOAD);//getScenarioDataDelegate(scenarioName, statName, fyear, tyear, iso3, mediaType);
     }
 
-
-     // ===================== model single var   ============================//
+    // ===================== model single var   ============================//
     @GET
     @Path("/{tempagg}/{gcm:\\w{8,15}}/{stat}/{fyear}/{tyear}/{iso3}")
     public Response getGcmData(
@@ -263,7 +394,7 @@ public class P_CountryDataResource {
             @PathParam("fyear") int fyear,
             @PathParam("tyear") int tyear,
             @PathParam("iso3") String iso3) {
-            log.info("getting single gcm");
+        log.info("getting single gcm");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -271,9 +402,8 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getSingleGcmData(gcmName,statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, WebService.Delivery.WEB);//getScenarioDataDelegate(scenarioName, statName, fyear, tyear, iso3, mediaType);
+        return WebService.get().getSingleGcmData(gcmName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, WebService.Delivery.WEB);//getScenarioDataDelegate(scenarioName, statName, fyear, tyear, iso3, mediaType);
     }
-
 
     // ===================== download model single var ============================//
     @GET
@@ -307,7 +437,7 @@ public class P_CountryDataResource {
             @PathParam("tyear") int tyear,
             @PathParam("percentile") int percentile,
             @PathParam("iso3") String iso3) {
-            log.info("getting ensemble scenario percentile");
+        log.info("getting ensemble scenario percentile");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -340,8 +470,7 @@ public class P_CountryDataResource {
         return WebService.get().getEnsembleScenario(scenarioName, statName, fyear, tyear, percentile, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
 
-
-     // =================  ensemble single scenario all percentile =============================
+    // =================  ensemble single scenario all percentile =============================
     @GET
     @Path("/{tempagg}/ensemble/{scenario:(?i)(20c3m|a2|b1)}/{stat}/{fyear}/{tyear}/{iso3}")
     public Response getSingleScenarioAllPercentile(
@@ -351,7 +480,7 @@ public class P_CountryDataResource {
             @PathParam("fyear") int fyear,
             @PathParam("tyear") int tyear,
             @PathParam("iso3") String iso3) {
-            log.info("getting single scenario all percentile");
+        log.info("getting single scenario all percentile");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -359,7 +488,7 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getSingleScenarioAllPercentile(scenarioName, statName,fyear,tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
+        return WebService.get().getSingleScenarioAllPercentile(scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
     // =================  download ensemble single scenario all percentile =============================
@@ -380,12 +509,10 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getSingleScenarioAllPercentile(scenarioName, statName,fyear,tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getSingleScenarioAllPercentile(scenarioName, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
 
-
-
-     // =================  get ensemble single percentile all scenario =============================
+    // =================  get ensemble single percentile all scenario =============================
     @GET
     @Path("/{tempagg}/ensemble/{percentile:\\d{2}}/{stat}/{fyear}/{tyear}/{iso3}")
     public Response getSinglePercentileAllScenario(
@@ -395,7 +522,7 @@ public class P_CountryDataResource {
             @PathParam("tyear") int tyear,
             @PathParam("percentile") int percentile,
             @PathParam("iso3") String iso3) {
-            log.info("getting ensemble single percentile all scenario");
+        log.info("getting ensemble single percentile all scenario");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -403,7 +530,7 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getSinglePercentileAllScenario(percentile, statName,fyear,tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
+        return WebService.get().getSinglePercentileAllScenario(percentile, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
     // =================  download ensemble single percentile all scenario =============================
@@ -424,9 +551,8 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getSinglePercentileAllScenario(percentile, statName,fyear,tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getSinglePercentileAllScenario(percentile, statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
-
 
     // =================  ensemble all scenario all percentile  =============================
     @GET
@@ -448,8 +574,7 @@ public class P_CountryDataResource {
         return WebService.get().getAllScenarioEnsemble(statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
-     // =================  download ensemble all scenario all percentile =============================
-
+    // =================  download ensemble all scenario all percentile =============================
     @GET
     @Path("/dl/{tempagg}/ensemble/{stat}/{fyear}/{tyear}/{iso3}")
     public Response downloadAllScenarioEnsemble(
@@ -466,19 +591,18 @@ public class P_CountryDataResource {
             return Response.ok(ResponseConstants.INVALID_ISO, MediaType.APPLICATION_JSON).build();
         }
 
-        return WebService.get().getAllScenarioEnsemble(statName, fyear, tyear,  countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
+        return WebService.get().getAllScenarioEnsemble(statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
 
     }
 
-
-     // ===============  variable projections  ==================
+    // ===============  variable projections  ==================
     @GET
     @Path("/{tempagg}/{stat}/projection/{iso3}")
     public Response getGcmProjections(
             @PathParam("tempagg") String tempagg,
             @PathParam("stat") String statName,
             @PathParam("iso3") String iso3) {
-            log.info("getting all projections");
+        log.info("getting all projections");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -489,14 +613,15 @@ public class P_CountryDataResource {
 
         return WebService.get().getGcmProjections(statName, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
-     // ===============  download variable projections  ==================
+    // ===============  download variable projections  ==================
+
     @GET
     @Path("/dl/{tempagg}/{stat}/projection/{iso3}")
     public Response downloadGcmProjections(
             @PathParam("tempagg") String tempagg,
             @PathParam("stat") String statName,
             @PathParam("iso3") String iso3) {
-            log.info("getting all projections");
+        log.info("getting all projections");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -508,15 +633,14 @@ public class P_CountryDataResource {
         return WebService.get().getGcmProjections(statName, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
 
-
-     // ===============  ensemble projections  ==================
+    // ===============  ensemble projections  ==================
     @GET
     @Path("/{tempagg}/ensemble/{stat}/projection/{iso3}")
     public Response getEnsembleProjections(
             @PathParam("tempagg") String tempagg,
             @PathParam("stat") String statName,
             @PathParam("iso3") String iso3) {
-            log.info("getting all projections");
+        log.info("getting all projections");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -528,14 +652,14 @@ public class P_CountryDataResource {
         return WebService.get().getEnsembleProjections(statName, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
 
-      // ===============  download ensemble projections  ==================
+    // ===============  download ensemble projections  ==================
     @GET
     @Path("/dl/{tempagg}/ensemble/{stat}/projection/{iso3}")
     public Response downloadEnsembleProjections(
             @PathParam("tempagg") String tempagg,
             @PathParam("stat") String statName,
             @PathParam("iso3") String iso3) {
-            log.info("getting all projections");
+        log.info("getting all projections");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -546,7 +670,7 @@ public class P_CountryDataResource {
 
         return WebService.get().getEnsembleProjections(statName, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
-   
+
     // ===============  L3  Gcm  ==================
     @GET
     @Path("/{tempagg}/{stat}/{fyear}/{tyear}/{iso3}")
@@ -556,7 +680,7 @@ public class P_CountryDataResource {
             @PathParam("fyear") int fyear,
             @PathParam("tyear") int tyear,
             @PathParam("iso3") String iso3) {
-            log.info("getting all gcm all scenario");
+        log.info("getting all gcm all scenario");
         String mediaType = RequestUtil.getResponseType(iso3);
         iso3 = RequestUtil.getIdentifier(iso3);
         int countryId = CountryService.get().getId(iso3);
@@ -567,7 +691,6 @@ public class P_CountryDataResource {
 
         return WebService.get().getAllGcmAllScenario(statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.WEB);
     }
-
 
     // ========  L3 Gcm Download  ===================  //
     @GET
@@ -588,9 +711,6 @@ public class P_CountryDataResource {
         Response r = WebService.get().getAllGcmAllScenario(statName, fyear, tyear, countryId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
         return r;
     }
-
-    
-   
 //    private Response getScenarioDataDelegate(
 //            String scenarioName,
 //            String statName,
@@ -616,8 +736,6 @@ public class P_CountryDataResource {
 //        Response.ResponseBuilder builder = Response.ok(formattedData, format);
 //        return builder.build();
 //    }
-
-
 //    private Response getAllScenarioEnsembleDelegate( String statName, int fyear, int tyear, int percentile, String iso3, String format) {
 //        int countryId = CountryService.get().getId(iso3);
 //        log.log(Level.INFO, "getting country id is {0}", countryId);
@@ -637,7 +755,6 @@ public class P_CountryDataResource {
 //
 //        return builder.build();
 //    }
-    
     // ============  aggregate across all gcms ==================//
 //    @GET
 //    @Path("/{scenario}/{stat}/{fyear}/{tyear}/{iso3}")
@@ -657,7 +774,6 @@ public class P_CountryDataResource {
 //
 //        return getAllMonthlyDataIsoDelegate(scenarioName, statName, fyear, tyear, iso3, MediaType.APPLICATION_JSON);
 //    }
- 
 //    private Response getAllGcmAllScenarioMonthlyDataIsoDelegate(
 //            String statName,
 //            int fyear,

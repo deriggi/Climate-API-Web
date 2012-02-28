@@ -31,11 +31,10 @@ public class CruDao {
     }
 
     private CruDao(){
-
     }
 
     public ArrayList<HashMap<String, Object>> getCruDataForPoint(int pointId, Date fromDate, Date toDate) {
-        Connection c = DBUtils.getConnection();
+        Connection c = database.DBUtils.getConnection();
         PreparedStatement ps = null;
         HashMap<String, Object> dataMap = new HashMap<String, Object>();
         ArrayList<HashMap<String,Object>> list = new ArrayList<HashMap<String,Object>>();

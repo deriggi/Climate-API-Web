@@ -32,25 +32,96 @@ public class P_BasinDataResource {
 
     private static final Logger log = Logger.getLogger(P_BasinDataResource.class.getName());
 
+    
      @GET
-    @Path("/kml/{wbhuc : \\d{1,6}}")
-    @Produces(MediaType.APPLICATION_XML)
-    public String getKmlCountryBoundary(@PathParam("wbhuc") int wbhuc) {
+    @Path("/kml/{threshold}/{wbhuc : \\d{1,6}}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlSimplifiedKmlBoundary(@PathParam("wbhuc") int wbhuc, @PathParam("threshold") double threshold) {
+        int basinId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            basinId = GeoDao.getEntityId(c, "basin", "code", wbhuc);
+            String kml = GeoDao.getSimplifiedGeometryAsKML(c, "basin", "geom", "id", basinId, threshold);
+            StringBuilder sb = new StringBuilder();
+            sb.append("<kml><Document><Placemark>");
+            sb.append("<name>");
+            sb.append(wbhuc);
+            sb.append("</name>");
+            sb.append(kml);
+            sb.append("</Placemark></Document></kml>");
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
 
+
+
+
+
+    @GET
+    @Path("/kml/{wbhuc : \\d{1,6}}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlCountryBoundary(@PathParam("wbhuc") int wbhuc) {
         int basinId = -1;
         Connection c = DBUtils.getConnection();
         try {
             basinId = GeoDao.getEntityId(c, "basin", "code", wbhuc);
             String kml = GeoDao.getGeometryAsKML(c, "basin", "geom", "id", basinId);
-            return kml;
+            StringBuilder sb = new StringBuilder();
+            sb.append("<kml><Document><Placemark>");
+            sb.append("<name>");
+            sb.append(wbhuc);
+            sb.append("</name>");
+            sb.append(kml);
+            sb.append("</Placemark></Document></kml>");
+            return sb.toString();
         } finally {
             DBUtils.close(c);
         }
-
-
-
-
     }
+
+   
+    @GET
+    @Path("/kmlpart/{wbhuc : \\d{1,6}}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getKmlPartBoundary(@PathParam("wbhuc") int wbhuc) {
+        int basinId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            basinId = GeoDao.getEntityId(c, "basin", "code", wbhuc);
+            String kml = GeoDao.getGeometryAsKML(c, "basin", "geom", "id", basinId);
+            StringBuilder sb = new StringBuilder();
+//            sb.append("<name>");  removed because it malforms the xml
+//            sb.append(wbhuc);
+//            sb.append("</name>");
+            sb.append(kml);
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+
+    @GET
+    @Path("/kmlpart/{threshold}/{wbhuc : \\d{1,6}}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getSimplifiedKmlPartBoundary(@PathParam("wbhuc") int wbhuc, @PathParam("threshold") double threshold) {
+        int basinId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            basinId = GeoDao.getEntityId(c, "basin", "code", wbhuc);
+            String kml = GeoDao.getSimplifiedGeometryAsKML(c, "basin", "geom", "id", basinId, threshold);
+            StringBuilder sb = new StringBuilder();
+//            sb.append("<name>");  removed because it malforms the xml
+//            sb.append(wbhuc);
+//            sb.append("</name>");
+            sb.append(kml);
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+
 
     // ================= L1 GCM =======================
     @GET
@@ -87,6 +158,25 @@ public class P_BasinDataResource {
         int basinId = BasinDao.get().getBasinIdFromCode(Integer.parseInt(identifier));
 
         return WebService.get().getGcmScenario(gcmName, scenarioName, statName, fyear, tyear, basinId ,WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg),mediaType, Delivery.DOWNLOAD);
+    }
+
+     // ================= L1 GCM download =======================
+    @GET
+    @Path("/dl/{tempagg}/{gcm:\\w{8,15}}/{scenario:(?i)(20c3m|a2|b1)}/{fyear}/{tyear}/{wbhuc : (?i)\\d{1,6}(\\.\\w{3,5}|\\.\\w{3,5})?}")
+    public Response downloadGcmScenarioAllVars(
+            @PathParam("tempagg") String tempagg,
+            @PathParam("gcm") String gcmName,
+            @PathParam("scenario") String scenarioName,
+            @PathParam("stat") String statName,
+            @PathParam("fyear") int fyear,
+            @PathParam("tyear") int tyear,
+             @PathParam("wbhuc") String wbhuc) {
+
+          String mediaType = RequestUtil.getResponseType(wbhuc);
+        String identifier = RequestUtil.getIdentifier(wbhuc);
+        int basinId = BasinDao.get().getBasinIdFromCode(Integer.parseInt(identifier));
+
+        return WebService.get().getGcmScenarioAllVariables(gcmName, scenarioName, fyear, tyear, basinId, WebService.get().getStatType(tempagg), WebService.get().geTempAgg(tempagg), mediaType, Delivery.DOWNLOAD);
     }
 
 

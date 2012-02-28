@@ -8,7 +8,6 @@ package oldv1.oldbasinresources;
  *
  * @author wb385924
  */
-import com.google.gson.Gson;
 import dao.basin.BasinDao;
 import domain.Basin;
 import domain.web.GcmDatum;

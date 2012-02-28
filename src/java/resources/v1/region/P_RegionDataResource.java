@@ -5,11 +5,16 @@
 package resources.v1.region;
 
 import com.sun.jersey.spi.resource.Singleton;
+import dao.GeoDao;
 import dao.ckpregion.CkpRegionDao;
+import database.DBUtils;
+import java.sql.Connection;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import service.WebService;
 import util.RequestUtil;
@@ -24,6 +29,95 @@ import service.WebService.Delivery;
 public class P_RegionDataResource {
 
     private static final Logger log = Logger.getLogger(P_RegionDataResource.class.getName());
+
+
+    @GET
+    @Path("/kml/{threshold}/{rcode : (?i)\\w{2}}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlSimplifiedBoundary(@PathParam("rcode") String rcode, @PathParam("threshold") double threshhold) {
+        int regionId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            regionId = GeoDao.getEntityId(c, "ckp_region", "code", rcode);
+            String kml = GeoDao.getSimplifiedGeometryAsKML(c, "ckp_region", "geom", "id", regionId, threshhold);
+            StringBuilder sb = new StringBuilder();
+            sb.append("<kml><Document><Placemark>");
+            sb.append("<name>");
+            sb.append(rcode);
+            sb.append("</name>");
+            sb.append(kml);
+            sb.append("</Placemark></Document></kml>");
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+
+
+
+    @GET
+    @Path("/kml/{rcode : (?i)\\w{2}}")
+    @Produces(RequestUtil.APP_KML)
+    public String getKmlCountryBoundary(@PathParam("rcode") String rcode) {
+        int regionId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            regionId = GeoDao.getEntityId(c, "ckp_region", "code", rcode);
+            String kml = GeoDao.getGeometryAsKML(c, "ckp_region", "geom", "id", regionId);
+            StringBuilder sb = new StringBuilder();
+            sb.append("<kml><Document><Placemark>");
+            sb.append("<name>");
+            sb.append(rcode);
+            sb.append("</name>");
+            sb.append(kml);
+            sb.append("</Placemark></Document></kml>");
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+
+    @GET
+    @Path("/kmlpart/{rcode : (?i)\\w{2}}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getKmlPartBoundary(@PathParam("rcode"
+            + "") String rcode) {
+        int regionId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            regionId = GeoDao.getEntityId(c, "ckp_region", "code", rcode);
+            String kml = GeoDao.getGeometryAsKML(c, "ckp_region", "geom", "id", regionId);
+            StringBuilder sb = new StringBuilder();
+//            sb.append("<name>");
+//            sb.append(rcode);
+//            sb.append("</name>");
+            sb.append(kml);
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+    @GET
+    @Path("/kmlpart/{threshold}/{rcode : (?i)\\w{2}}")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getKmlPartSimplifiedBoundary(@PathParam("rcode") String rcode, @PathParam("threshold") double threshold) {
+        int regionId = -1;
+        Connection c = DBUtils.getConnection();
+        try {
+            regionId = GeoDao.getEntityId(c, "ckp_region", "code", rcode);
+            String kml = GeoDao.getSimplifiedGeometryAsKML(c, "ckp_region", "geom", "id", regionId, threshold);
+            StringBuilder sb = new StringBuilder();
+//            sb.append("<name>");
+//            sb.append(rcode);
+//            sb.append("</name>");
+            sb.append(kml);
+            return sb.toString();
+        } finally {
+            DBUtils.close(c);
+        }
+    }
+
+
 
     // ================= L1 GCM =======================
     @GET

@@ -22,7 +22,7 @@ public class RequestUtil {
     private static final String XML_REGEX = "(?i)\\.XML";
     private static final String CSV_REGEX = "(?i)\\.CSV";
     private static final String DOT = ".";
-
+    public  static final String APP_KML = "application/vnd.google-earth.kml+xml";
     private static Pattern getXMLPattern() {
         if (xmlPattern == null) {
             xmlPattern = Pattern.compile(XML_REGEX);

@@ -6,7 +6,6 @@ package export;
 
 import com.google.gson.Gson;
 import com.thoughtworks.xstream.XStream;
-import domain.Cru;
 import domain.CruType;
 import java.util.List;
 import javax.ws.rs.core.MediaType;

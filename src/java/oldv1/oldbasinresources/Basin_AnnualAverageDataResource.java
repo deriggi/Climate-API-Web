@@ -8,7 +8,6 @@ package oldv1.oldbasinresources;
  *
  * @author wb385924
  */
-import com.google.gson.Gson;
 import dao.basin.BasinDao;
 import domain.Basin;
 import domain.web.GcmDatum;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;

@@ -44,16 +44,7 @@ public class CountryResource {
     private Pattern p = null;
     // The Java method will process HTTP GET requests
 
-    @GET
-    // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
-    @Produces("application/json")
-    public String getClichedMessage() {
-
-        return new Gson().toJson(CountryService.get().getCountries());
-
-    }
-
+    
     @GET
     @Path("/search/")
     @Produces("application/json")
@@ -103,6 +94,14 @@ public class CountryResource {
             try {
                 countryId = CountryService.get().getId(iso3);
                 String kml = GeoDao.getGeometryAsKML(c, "boundary", "shape", "area_id", countryId);
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("<kml><Document><Placemark>");
+                sb.append(kml);
+                sb.append("</Placemark></Document></kml>");
+
+
+                
                 return kml;
             } finally {
                 DBUtils.close(c);
@@ -113,27 +112,7 @@ public class CountryResource {
 
 
     }
-    @GET
-    @Path("/bbox/kml/{iso3:\\w{3}}")
-    @Produces(MediaType.APPLICATION_XML)
-    public String getBboxKmlCountryBoundary(@PathParam("iso3") String iso3) {
-
-        int countryId = -1;
-        if (iso3 != null && iso3.trim().length() == 3) {
-            Connection c = DBUtils.getConnection();
-            try {
-                countryId = CountryService.get().getId(iso3);
-                String kml = GeoDao.getGeometryBboxAsKML(c, "boundary", "shape", "area_id", countryId);
-                return kml;
-            } finally {
-                DBUtils.close(c);
-            }
-
-        }
-        return "<kml></kml>";
-
-
-    }
+    
 
     @GET
     @Path("/simplekml/{iso3}")
