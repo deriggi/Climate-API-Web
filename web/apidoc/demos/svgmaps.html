@@ -23,7 +23,7 @@
                     drawMapsFromForm();
                 });
                 
-               drawMapsFromForm();
+                drawMapsFromForm();
 
                 //                var testPath1 = "M 117.5 -87.5 L 117.5 -90 120 -90 120 -87.5 Z M 190 -85 L 190 -87.5 187.5 -87.5 187.5 -90 190 -90 192.5 -90 192.5 -87.5 192.5 -85 Z M 160 -107.5 L 160 -105 157.5 -105 155 -105 152.5 -105 150 -105 150 -102.5 147.5 -102.5 145 -102.5 142.5 -102.5 142.5 -100 140 -100 137.5 -100 135 -100 135 -97.5 132.5 -97.5 130 -97.5 127.5 -97.5 125 -97.5 125 -95 122.5 -95 120 -95 120 -92.5 117.5 -92.5 117.5 -95 117.5 -97.5 120 -97.5 120 -100 120 -102.5 122.5 -102.5 125 -102.5 125 -105 125 -107.5 125 -110 125 -112.5 127.5 -112.5 130 -112.5 132.5 -112.5 132.5 -110 135 -110 137.5 -110 137.5 -112.5 140 -112.5 142.5 -112.5 145 -112.5 145 -110 147.5 -110 147.5 -112.5 150 -112.5 152.5 -112.5 155 -112.5 157.5 -112.5 160 -112.5 162.5 -112.5 165 -112.5 167.5 -112.5 170 -112.5 170 -110 172.5 -110 172.5 -112.5 175 -112.5 177.5 -112.5 177.5 -110 180 -110 182.5 -110 185 -110 185 -107.5 185 -105 185 -102.5 185 -100 185 -97.5 185 -95 185 -92.5 182.5 -92.5 180 -92.5 180 -95 177.5 -95 177.5 -97.5 175 -97.5 175 -100 172.5 -100 172.5 -102.5 172.5 -105 170 -105 170 -107.5 167.5 -107.5 165 -107.5 162.5 -107.5 Z";
                 //                var testPath2 = "M 130 -30 L 130 -32.5 127.5 -32.5 127.5 -35 125 -35 125 -37.5 125 -40 122.5 -40 122.5 -42.5 120 -42.5 117.5 -42.5 117.5 -45 117.5 -47.5 117.5 -50 115 -50 115 -52.5 112.5 -52.5 112.5 -55 112.5 -57.5 112.5 -60 110 -60 110 -62.5 107.5 -62.5 107.5 -65 107.5 -67.5 110 -67.5 112.5 -67.5 112.5 -65 115 -65 115 -62.5 115 -60 117.5 -60 120 -60 122.5 -60 125 -60 127.5 -60 127.5 -62.5 127.5 -65 130 -65 132.5 -65 135 -65 137.5 -65 140 -65 142.5 -65 145 -65 147.5 -65 150 -65 152.5 -65 152.5 -67.5 152.5 -70 152.5 -72.5 155 -72.5 155 -70 157.5 -70 157.5 -72.5 157.5 -75 160 -75 160 -77.5 160 -80 162.5 -80 165 -80 167.5 -80 170 -80 170 -82.5 172.5 -82.5 175 -82.5 175 -80 177.5 -80 180 -80 182.5 -80 185 -80 185 -77.5 185 -75 185 -72.5 185 -70 182.5 -70 182.5 -67.5 182.5 -65 182.5 -62.5 180 -62.5 180 -60 177.5 -60 177.5 -57.5 177.5 -55 175 -55 172.5 -55 172.5 -52.5 172.5 -50 172.5 -47.5 170 -47.5 170 -45 172.5 -45 172.5 -42.5 170 -42.5 170 -40 170 -37.5 172.5 -37.5 172.5 -35 175 -35 175 -32.5 172.5 -32.5 172.5 -30 172.5 -27.5 175 -27.5 177.5 -27.5 180 -27.5 180 -25 180 -22.5 177.5 -22.5 175 -22.5 172.5 -22.5 172.5 -20 170 -20 170 -22.5 167.5 -22.5 165 -22.5 162.5 -22.5 160 -22.5 160 -20 162.5 -20 162.5 -17.5 160 -17.5 157.5 -17.5 157.5 -20 155 -20 155 -22.5 152.5 -22.5 150 -22.5 147.5 -22.5 147.5 -20 145 -20 142.5 -20 140 -20 140 -22.5 137.5 -22.5 135 -22.5 135 -25 135 -27.5 132.5 -27.5 132.5 -30 Z";
@@ -66,6 +66,7 @@
             .content {
                 background-color: #fff;
                 padding: 20px;
+                height:850px;
                 margin: 0 -20px; /* negative indent the amount of the padding to maintain the grid system */
                 -webkit-border-radius: 0 0 6px 6px;
                 -moz-border-radius: 0 0 6px 6px;
@@ -73,6 +74,7 @@
                 -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
                 -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
                 box-shadow: 0 1px 2px rgba(0,0,0,.15);
+
             }
 
             /* Page header tweaks */
@@ -87,18 +89,18 @@
 
 
             /* Give a quick and non-cross-browser friendly divider */
-/*            .content .span4 {
-                margin-left: 0;
-                padding-left: 19px;
-                border-left: 1px solid #eee;
-            }*/
+            /*            .content .span4 {
+                            margin-left: 0;
+                            padding-left: 19px;
+                            border-left: 1px solid #eee;
+                        }*/
 
             .topbar .btn {
                 border: 0;
             }
 
         </style>
-        
+
     </head>
 
     <body>
@@ -121,7 +123,7 @@
 
             <div class="content">
                 <div class="page-header">
-                    <h1>Mozambique <small> Maps derived from 0.5 degree data</small></h1>
+                    <h1>Compare GCMs <small> Maps derived from 0.5 degree data</small></h1>
                 </div>
                 <div class ="row" style="border-bottom: 1px solid #DDD">
                     <div class="span5">
@@ -144,8 +146,9 @@
                                     <select class="medium"  id="countrySelect">
                                         <option value="MOZ">Mozambique</option>
                                         <option value="ETH">Ethiopia</option>
-                                        <option value="SDN">Sudan</option>
+                                        <option selected="true" value="SDN">Sudan</option>
                                         <option value="SOM">Somalia</option>
+                                        <option value="RWA">Rwanda</option>
                                     </select>
                                 </div>
                             </div>
@@ -161,7 +164,7 @@
                             </div>
 
                             <div class = "clearfix">
-                                
+
                                 <label for="scenarioSelect"> <span>i</span> Scenario</label>
                                 <div class="input">
                                     <select class="small"  id="scenarioSelect">
@@ -179,43 +182,66 @@
                 </div>
                 <br/>
                 <div class="row">
-                    <div class="span4 " style="height:200px">
+                    <div class="span3 " style="height:200px">
                         <h4>GFDL-CM2.1</h4>
                         <div id ="gfdl_cm2_1">
 
                         </div>
 
                     </div>
-                    <div class="span4 " style="height:200px">
-                        <h4>CNRM-CM3</h4>
-                        <div id="cnrm_cm3">
 
-                        </div>
-                    </div>
-                    <div class="span4 " style="height:200px">
+                    <div class="span3 " style="height:200px">
                         <h4>GFDL-CM2.0</h4>
                         <div id ="gfdl_cm2_0" >
 
                         </div>
                     </div>
-                    <div class="span1 " style="height:200px">
-                        loading
+
+                    <div class="span3 " style="height:200px">
+                        <h4>CNRM-CM3</h4>
+                        <div id="cnrm_cm3">
+
+                        </div>
                     </div>
+
+                    <div class="span3 " style="height:200px">
+                        <h4>ECHO-G</h4>
+                        <div id ="miub_echo_g"   >
+
+                        </div>
+                    </div>
+
 
                 </div>
                 <div class="row">
-                    <div class="span4 " style="height:200px">
-                        <h4>MIROC3.2</h4>
-                        <div id ="miroc3_2_medres"   >
+                </div
 
+                <div class="row">
+                    <div class="span3 " style="height:200px">
+                        <h4>ECHAM5/MPI-OM</h4>
+                        <div id ="mpi_echam5"   >
+
+                        </div>
+                    </div>
+
+                    <div class="span3 " style="height:200px">
+                        <h4>GCM3.1(T47)</h4>
+                        <div id ="cccma_cgcm3_1"   >
+                       
                         </div>
 
                     </div>
-                    <div class="span4 " style="height:200px">
-                       
+                    <div class="span3 " style="height:200px">
+                        <h4>MRI-CGCM2.3.2</h4>
+                        <div id ="mri_cgcm2_3_2a"   >
+
+                        </div>
                     </div>
-                    <div class="span4 " style="height:200px">
-                       
+                    <div class="span3 " style="height:200px">
+                        <h4>IPSL_CM4</h4>
+                        <div id ="ipsl_cm4"   >
+
+                        </div>
                     </div>
 
                 </div>

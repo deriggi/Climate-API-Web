@@ -1,0 +1,542 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>WebService.java</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+body {color: #000000; background-color: #ffffff; font-family: Monospaced}
+pre {color: #000000; background-color: #ffffff; font-family: Monospaced}
+table {color: #000000; background-color: #e9e8e2; font-family: Monospaced}
+.ST0 {color: #969696; font-family: Monospaced; font-weight: bold}
+.comment {color: #969696}
+.line-number {background-color: #e9e8e2}
+.character {color: #ce7b00}
+.keyword-directive {color: #0000e6}
+-->
+</style>
+</head>
+<body>
+<table width="100%"><tr><td align="center">C:\Users\wb385924\Documents\NetBeansProjects\ClimateWeb\src\java\service\WebService.java</td></tr></table>
+<pre>
+<span class="line-number">  1</span> <span class="comment">/*</span>
+<span class="line-number">  2</span> <span class="comment"> * To change this template, choose Tools | Templates</span>
+<span class="line-number">  3</span> <span class="comment"> * and open the template in the editor.</span>
+<span class="line-number">  4</span> <span class="comment"> */</span>
+<span class="line-number">  5</span> <span class="keyword-directive">package</span> service;
+<span class="line-number">  6</span> 
+<span class="line-number">  7</span> <span class="keyword-directive">import</span> domain.web.EnsembleDatum;
+<span class="line-number">  8</span> <span class="keyword-directive">import</span> domain.web.GcmDatum;
+<span class="line-number">  9</span> <span class="keyword-directive">import</span> export.DataFormatHelper;
+<span class="line-number"> 10</span> <span class="keyword-directive">import</span> java.util.HashMap;
+<span class="line-number"> 11</span> <span class="keyword-directive">import</span> java.util.List;
+<span class="line-number"> 12</span> <span class="keyword-directive">import</span> java.util.logging.Logger;
+<span class="line-number"> 13</span> <span class="keyword-directive">import</span> javax.ws.rs.core.MediaType;
+<span class="line-number"> 14</span> <span class="keyword-directive">import</span> javax.ws.rs.core.Response;
+<span class="line-number"> 15</span> <span class="keyword-directive">import</span> util.ResponseConstants;
+<span class="line-number"> 16</span> <span class="keyword-directive">import</span> shapefileloader.ensemble.P_EnsembleConfig;
+<span class="line-number"> 17</span> <span class="keyword-directive">import</span> shapefileloader.ensemble.P_EnsembleConfigAreaDao;
+<span class="line-number"> 18</span> <span class="keyword-directive">import</span> shapefileloader.gcm.P_GcmConfig;
+<span class="line-number"> 19</span> <span class="keyword-directive">import</span> shapefileloader.gcm.P_GcmConfigAreaDao;
+<span class="line-number"> 20</span> <span class="keyword-directive">import</span> shapefileloader.gcm.P_GcmStatsProperties;
+<span class="line-number"> 21</span> <span class="keyword-directive">import</span> shapefileloader.gcm.P_GcmStatsProperties.stat_type;
+<span class="line-number"> 22</span> 
+<span class="line-number"> 23</span> <span class="comment">/**</span>
+<span class="line-number"> 24</span> <span class="comment"> *</span>
+<span class="line-number"> 25</span> <span class="comment"> * </span><span class="ST0">@author</span> <span class="comment">w</span><span class="comment">b385924</span>
+<span class="line-number"> 26</span>  <span class="comment">*/</span>
+<span class="line-number"> 27</span> <span class="keyword-directive">public</span> <span class="keyword-directive">class</span> WebService {
+<span class="line-number"> 28</span> 
+<span class="line-number"> 29</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> Logger log = Logger.getLogger(WebService.<span class="keyword-directive">class</span>.getName());
+<span class="line-number"> 30</span> 
+<span class="line-number"> 31</span>     <span class="keyword-directive">public</span> <span class="keyword-directive">enum</span> TempAgg {
+<span class="line-number"> 32</span> 
+<span class="line-number"> 33</span>         ANNUAL(<span class="keyword-directive">true</span>), MONTHLY(<span class="keyword-directive">false</span>);
+<span class="line-number"> 34</span>         <span class="keyword-directive">private</span> <span class="keyword-directive">boolean</span> isAnnual;
+<span class="line-number"> 35</span> 
+<span class="line-number"> 36</span>         <span class="keyword-directive">public</span> <span class="keyword-directive">boolean</span> isIsAnnual() {
+<span class="line-number"> 37</span>             <span class="keyword-directive">retu</span><span class="keyword-directive">rn</span> isAnnual;
+<span class="line-number"> 38</span>         }
+<span class="line-number"> 39</span> 
+<span class="line-number"> 40</span>         TempAgg(<span class="keyword-directive">boolean</span> isAnnual) {
+<span class="line-number"> 41</span>             <span class="keyword-directive">this</span>.isAnnual = isAnnual;
+<span class="line-number"> 42</span>         }
+<span class="line-number"> 43</span>     }
+<span class="line-number"> 44</span> 
+<span class="line-number"> 45</span>     <span class="keyword-directive">public</span> <span class="keyword-directive">enum</span> Delivery {
+<span class="line-number"> 46</span> 
+<span class="line-number"> 47</span>         DOWNLOAD(<span class="keyword-directive">true</span>), WEB(<span class="keyword-directive">false</span>);
+<span class="line-number"> 48</span>         <span class="keyword-directive">private</span> <span class="keyword-directive">boolean</span> download;
+<span class="line-number"> 49</span> 
+<span class="line-number"> 50</span>         <span class="keyword-directive">public</span> <span class="keyword-directive">boolean</span> isDownload() {
+<span class="line-number"> 51</span>             <span class="keyword-directive">return</span> download;
+<span class="line-number"> 52</span>         }
+<span class="line-number"> 53</span> 
+<span class="line-number"> 54</span>         Delivery(<span class="keyword-directive">boolean</span> isDownload) {
+<span class="line-number"> 55</span>             <span class="keyword-directive">this</span>.download = isDownload;
+<span class="line-number"> 56</span>         }
+<span class="line-number"> 57</span>     }
+<span class="line-number"> 58</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> WebService webService = <span class="keyword-directive">null</span>;
+<span class="line-number"> 59</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> HashMap&lt;String, P_GcmStatsProperties.stat_type&gt; statTypeMap = <span class="keyword-directive">new</span> HashMap&lt;String, P_GcmStatsProperties.stat_type&gt;();
+<span class="line-number"> 60</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> HashMap&lt;String, Boolean&gt; isAnnualMap = <span class="keyword-directive">new</span> HashMap&lt;String, Boolean&gt;();
+<span class="line-number"> 61</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> HashMap&lt;String, WebService.TempAgg&gt; tempAggMap = <span class="keyword-directive">new</span> HashMap&lt;String, WebService.TempAgg&gt;();
+<span class="line-number"> 62</span> 
+<span class="line-number"> 63</span>     <span class="keyword-directive">public</span> <span class="keyword-directive">static</span> WebService get() {
+<span class="line-number"> 64</span> 
+<span class="line-number"> 65</span>         <span class="keyword-directive">if</span> (webService == <span class="keyword-directive">null</span>) {
+<span class="line-number"> 66</span>             webService = <span class="keyword-directive">new</span> WebService();
+<span class="line-number"> 67</span>             initMap();
+<span class="line-number"> 68</span>         }
+<span class="line-number"> 69</span> 
+<span class="line-number"> 70</span>         <span class="keyword-directive">return</span> webService;
+<span class="line-number"> 71</span>     }
+<span class="line-number"> 72</span> 
+<span class="line-number"> 73</span>     <span class="keyword-directive">public</span> P_GcmStatsProperties.stat_type getStatType(String key) {
+<span class="line-number"> 74</span>         <span class="keyword-directive">if</span> (key == <span class="keyword-directive">null</span>) {
+<span class="line-number"> 75</span>             <span class="keyword-directive">return</span> <span class="keyword-directive">null</span>;
+<span class="line-number"> 76</span>         }
+<span class="line-number"> 77</span>         <span class="keyword-directive">return</span> statTypeMap.get(key);
+<span class="line-number"> 78</span>     }
+<span class="line-number"> 79</span> 
+<span class="line-number"> 80</span>     <span class="keyword-directive">public</span> <span class="keyword-directive">boolean</span> isAnnual(String key) {
+<span class="line-number"> 81</span>         <span class="keyword-directive">if</span> (key == <span class="keyword-directive">null</span> || !isAnnualMap.containsKey(key)) {
+<span class="line-number"> 82</span>             <span class="keyword-directive">return</span> <span class="keyword-directive">false</span>;
+<span class="line-number"> 83</span>         }
+<span class="line-number"> 84</span>         <span class="keyword-directive">return</span> isAnnualMap.get(key);
+<span class="line-number"> 85</span>     }
+<span class="line-number"> 86</span> 
+<span class="line-number"> 87</span>     <span class="keyword-directive">public</span> WebService.TempAgg geTempAgg(String key) {
+<span class="line-number"> 88</span>         <span class="keyword-directive">if</span> (key == <span class="keyword-directive">null</span> || !tempAggMap.containsKey(key)) {
+<span class="line-number"> 89</span>             <span class="keyword-directive">return</span> WebService.TempAgg.MONTHLY;
+<span class="line-number"> 90</span>         }
+<span class="line-number"> 91</span>         <span class="keyword-directive">retu</span><span class="keyword-directive">rn</span> tempAggMap.get(key);
+<span class="line-number"> 92</span>     }
+<span class="line-number"> 93</span> 
+<span class="line-number"> 94</span>     <span class="keyword-directive">private</span> <span class="keyword-directive">static</span> <span class="keyword-directive">void</span> initMap() {
+<span class="line-number"> 95</span>         statTypeMap.put(<span class="character">&quot;</span><span class="character">mavg</span><span class="character">&quot;</span>, stat_type.mean);
+<span class="line-number"> 96</span>         statTypeMap.put(<span class="character">&quot;</span><span class="character">annualavg</span><span class="character">&quot;</span>, stat_type.mean);
+<span class="line-number"> 97</span>         statTypeMap.put(<span class="character">&quot;</span><span class="character">manom</span><span class="character">&quot;</span>, stat_type.anom);
+<span class="line-number"> 98</span>         statTypeMap.put(<span class="character">&quot;</span><span class="character">annualanom</span><span class="character">&quot;</span>, stat_type.anom);
+<span class="line-number"> 99</span> 
+<span class="line-number">100</span>         isAnnualMap.put(<span class="character">&quot;</span><span class="character">mavg</span><span class="character">&quot;</span>, <span class="keyword-directive">false</span>);
+<span class="line-number">101</span>         isAnnualMap.put(<span class="character">&quot;</span><span class="character">annualavg</span><span class="character">&quot;</span>, <span class="keyword-directive">true</span>);
+<span class="line-number">102</span>         isAnnualMap.put(<span class="character">&quot;</span><span class="character">manom</span><span class="character">&quot;</span>, <span class="keyword-directive">false</span>);
+<span class="line-number">103</span>         isAnnualMap.put(<span class="character">&quot;</span><span class="character">annualanom</span><span class="character">&quot;</span>, <span class="keyword-directive">true</span>);
+<span class="line-number">104</span> 
+<span class="line-number">105</span> 
+<span class="line-number">106</span>         tempAggMap.put(<span class="character">&quot;</span><span class="character">mavg</span><span class="character">&quot;</span>, WebService.TempAgg.MONTHLY);
+<span class="line-number">107</span>         tempAggMap.put(<span class="character">&quot;</span><span class="character">annualavg</span><span class="character">&quot;</span>, WebService.TempAgg.ANNUAL);
+<span class="line-number">108</span>         tempAggMap.put(<span class="character">&quot;</span><span class="character">manom</span><span class="character">&quot;</span>, WebService.TempAgg.MONTHLY);
+<span class="line-number">109</span>         tempAggMap.put(<span class="character">&quot;</span><span class="character">annualanom</span><span class="character">&quot;</span>, WebService.TempAgg.ANNUAL);
+<span class="line-number">110</span>     }
+<span class="line-number">111</span> 
+<span class="line-number">112</span>     <span class="comment">/**</span>
+<span class="line-number">113</span> <span class="comment">     *          // </span><span class="comment">L3</span>  <span class="comment">No</span> <span class="comment">scenario</span> <span class="comment">required</span>
+<span class="line-number">114</span>     <span class="comment"> *</span>
+<span class="line-number">115</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">116</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">117</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">118</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">iso3</span>
+<span class="line-number">119</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statType</span>
+<span class="line-number">120</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">isAnnual</span>
+<span class="line-number">121</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">format</span>
+<span class="line-number">122</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">download</span>
+<span class="line-number">123</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">124</span>      <span class="comment">*/</span>
+<span class="line-number">125</span>     <span class="keyword-directive">public</span> Response getAllGcmAllScenario(
+<span class="line-number">126</span>             String statName,
+<span class="line-number">127</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">128</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">129</span>             <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">130</span> 
+<span class="line-number">131</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">132</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">133</span> 
+<span class="line-number">134</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">135</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, <span class="keyword-directive">null</span>, <span class="keyword-directive">null</span>, stat, fyear, tyear);
+<span class="line-number">136</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span>) {
+<span class="line-number">137</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">138</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">139</span>         }
+<span class="line-number">140</span>         config.setAreaId(areaId);
+<span class="line-number">141</span> <span class="comment">//        List&lt;GcmDat</span><span class="comment">um&gt; gcms = P_GcmConfigAreaDao.get().getAllScenarioAllGcmData(config, agg.isIsAnnual());</span>
+<span class="line-number">142</span> <span class="comment">//        String formattedData = DataFormatHelper.formatGcms(format, gcms);</span>
+<span class="line-number">143</span>          List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">144</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">145</span>         
+<span class="line-number">146</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">147</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">148</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">149</span>     }
+<span class="line-number">150</span> 
+<span class="line-number">151</span>     <span class="keyword-directive">public</span> Response getGcmProjections(
+<span class="line-number">152</span>             String statName,
+<span class="line-number">153</span>             <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">154</span> 
+<span class="line-number">155</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">156</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">157</span> 
+<span class="line-number">158</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">159</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, <span class="keyword-directive">null</span>, <span class="keyword-directive">null</span>, stat, 2000, -1);
+<span class="line-number">160</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span>) {
+<span class="line-number">161</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">162</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">163</span>         }
+<span class="line-number">164</span>         config.setAreaId(areaId);
+<span class="line-number">165</span> <span class="comment">//        List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getAllScenarioAllGcmData(co</span><span class="comment">nfig, agg.isIsAnnual());</span>
+<span class="line-number">166</span> <span class="comment">//        String formattedData = DataFormatHelper.formatGcms(format, gcms);</span>
+<span class="line-number">167</span>          List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">168</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">169</span> 
+<span class="line-number">170</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">171</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">172</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">173</span>     }
+<span class="line-number">174</span> 
+<span class="line-number">175</span>      <span class="keyword-directive">public</span> Response getEnsembleProjections(String statName,  <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">176</span> 
+<span class="line-number">177</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">178</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">179</span> 
+<span class="line-number">180</span>         P_EnsembleConfig config = <span class="keyword-directive">new</span> P_EnsembleConfig(statType, <span class="keyword-directive">null</span>, stat, 2000, -1, -1);
+<span class="line-number">181</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span>) {
+<span class="line-number">182</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">183</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">184</span>         }
+<span class="line-number">185</span>         config.setAreaId(areaId);
+<span class="line-number">186</span> 
+<span class="line-number">187</span> <span class="comment">//        List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getAllScena</span><span class="comment">rioAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">188</span> <span class="comment">//        String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);</span>
+<span class="line-number">189</span> 
+<span class="line-number">190</span>         List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getEnsembleData(config, agg.isIsAnnual());
+<span class="line-number">191</span>         String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);
+<span class="line-number">192</span> 
+<span class="line-number">193</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">194</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">195</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">196</span>     }
+<span class="line-number">197</span>     <span class="comment">/**</span>
+<span class="line-number">198</span> <span class="comment">     * </span><span class="comment">L3</span> <span class="comment">Ensemble</span>
+<span class="line-number">199</span>      <span class="comment">* </span>
+<span class="line-number">200</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">201</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">202</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">203</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">percentile</span>
+<span class="line-number">204</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">areaId</span>
+<span class="line-number">205</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statT</span><span class="comment">ype</span>
+<span class="line-number">206</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">agg</span>
+<span class="line-number">207</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">format</span>
+<span class="line-number">208</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">delivery</span>
+<span class="line-number">209</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">210</span>      <span class="comment">*/</span>
+<span class="line-number">211</span>     <span class="keyword-directive">public</span> Response getAllScenarioEnsemble(String statName, <span class="keyword-directive">int</span> fyear, <span class="keyword-directive">int</span> tyear, <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">212</span> 
+<span class="line-number">213</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">214</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">215</span> 
+<span class="line-number">216</span>         P_EnsembleConfig config = <span class="keyword-directive">new</span> P_EnsembleConfig(statType, <span class="keyword-directive">null</span>, stat, fyear, tyear, -1);
+<span class="line-number">217</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span>) {
+<span class="line-number">218</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">219</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">220</span>         }
+<span class="line-number">221</span>         config.setAreaId(areaId);
+<span class="line-number">222</span> 
+<span class="line-number">223</span> <span class="comment">//        List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getAllScena</span><span class="comment">rioAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">224</span> <span class="comment">//        String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);</span>
+<span class="line-number">225</span> 
+<span class="line-number">226</span>         List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getEnsembleData(config, agg.isIsAnnual());
+<span class="line-number">227</span>         String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);
+<span class="line-number">228</span> 
+<span class="line-number">229</span>         Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">230</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">231</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">232</span>     }
+<span class="line-number">233</span> 
+<span class="line-number">234</span> 
+<span class="line-number">235</span>     <span class="keyword-directive">public</span> Response getSingleScenarioAllPercentile(String scenarioName, String statName, <span class="keyword-directive">int</span> fyear, <span class="keyword-directive">int</span> tyear,  <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">236</span> 
+<span class="line-number">237</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">238</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">239</span>         P_GcmStatsProperties.scenario scenario = ds.getScenario(scenarioName);
+<span class="line-number">240</span> 
+<span class="line-number">241</span>         P_EnsembleConfig config = <span class="keyword-directive">new</span> P_EnsembleConfig(statType, scenario, stat, fyear, tyear, -1);
+<span class="line-number">242</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span> || scenario == <span class="keyword-directive">null</span>) {
+<span class="line-number">243</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">244</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">245</span>         }
+<span class="line-number">246</span>         config.setAreaId(areaId);
+<span class="line-number">247</span> 
+<span class="line-number">248</span>         List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getEnsembleData(config, agg.isIsAnnual());
+<span class="line-number">249</span>         String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);
+<span class="line-number">250</span> 
+<span class="line-number">251</span> <span class="comment">//        List&lt;EnsembleDatum&gt; ensembles = P</span><span class="comment">_EnsembleConfigAreaDao.get().getSingleScenarioAllPercentile(config, agg.isIsAnnual());</span>
+<span class="line-number">252</span> <span class="comment">//        String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);</span>
+<span class="line-number">253</span> 
+<span class="line-number">254</span> 
+<span class="line-number">255</span>        Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">256</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">257</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">258</span>     }
+<span class="line-number">259</span> 
+<span class="line-number">260</span> 
+<span class="line-number">261</span>     <span class="keyword-directive">public</span> Response getSinglePercentileAllScenario(<span class="keyword-directive">int</span> percentiel, String statName, <span class="keyword-directive">int</span> fyear, <span class="keyword-directive">int</span> tyear,  <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">262</span> 
+<span class="line-number">263</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">264</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">265</span> 
+<span class="line-number">266</span>         P_EnsembleConfig config = <span class="keyword-directive">new</span> P_EnsembleConfig(statType, <span class="keyword-directive">null</span>, stat, fyear, tyear, percentiel);
+<span class="line-number">267</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">nul</span><span class="keyword-directive">l</span> || statType == <span class="keyword-directive">null</span>) {
+<span class="line-number">268</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">269</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">270</span>         }
+<span class="line-number">271</span>         config.setAreaId(areaId);
+<span class="line-number">272</span> 
+<span class="line-number">273</span>         List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getEnsembleData(config, agg.isIsAnnual());
+<span class="line-number">274</span>         String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);
+<span class="line-number">275</span> 
+<span class="line-number">276</span> 
+<span class="line-number">277</span>         Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">278</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">279</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">280</span>     }
+<span class="line-number">281</span> 
+<span class="line-number">282</span> 
+<span class="line-number">283</span> 
+<span class="line-number">284</span> 
+<span class="line-number">285</span> 
+<span class="line-number">286</span>     <span class="keyword-directive">public</span> Response getEnsembleScenario(String scenarioName, String statName, <span class="keyword-directive">int</span> fyear, <span class="keyword-directive">int</span> tyear, <span class="keyword-directive">int</span> percentile, <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">287</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">288</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">289</span>         P_GcmStatsProperties.scenario scenario = ds.getScenario(scenarioName);
+<span class="line-number">290</span> 
+<span class="line-number">291</span>         P_EnsembleConfig config = <span class="keyword-directive">new</span> P_EnsembleConfig(statType, scenario, stat, fyear, tyear, percentile);
+<span class="line-number">292</span>         <span class="keyword-directive">if</span> (!config.isCompleteIgnoringAreaValueMonth()) {
+<span class="line-number">293</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">294</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">295</span>         }
+<span class="line-number">296</span>         config.setAreaId(areaId);
+<span class="line-number">297</span> 
+<span class="line-number">298</span> <span class="comment">//        HashMap&lt;In</span><span class="comment">teger, Double&gt; data = P_EnsembleConfigAreaDao.get().getAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">299</span> <span class="comment">//        String formattedData = DataFormatHelper.formatMonthlyOrAnnualMap(format, data);</span>
+<span class="line-number">300</span> 
+<span class="line-number">301</span>          List&lt;EnsembleDatum&gt; ensembles = P_EnsembleConfigAreaDao.get().getEnsembleData(config, agg.isIsAnnual());
+<span class="line-number">302</span>         String formattedData = DataFormatHelper.formatEnsembles(format, ensembles);
+<span class="line-number">303</span> 
+<span class="line-number">304</span> 
+<span class="line-number">305</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">306</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">307</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">308</span>     }
+<span class="line-number">309</span> 
+<span class="line-number">310</span>     <span class="comment">/**</span>
+<span class="line-number">311</span> <span class="comment">     *</span>
+<span class="line-number">312</span> <span class="comment">     * </span><span class="comment">L2</span>
+<span class="line-number">313</span> <span class="comment">     *</span>
+<span class="line-number">314</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">scenarioName</span>
+<span class="line-number">315</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">316</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">317</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">318</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">areaId</span>
+<span class="line-number">319</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">sta</span><span class="comment">tType</span>
+<span class="line-number">320</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">agg</span>
+<span class="line-number">321</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">format</span>
+<span class="line-number">322</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">323</span>      <span class="comment">*/</span>
+<span class="line-number">324</span>     <span class="keyword-directive">public</span> Response getSingleScenarioData(
+<span class="line-number">325</span>             String scenarioName,
+<span class="line-number">326</span>             String statName,
+<span class="line-number">327</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">328</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">329</span>             <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">330</span> 
+<span class="line-number">331</span> 
+<span class="line-number">332</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">333</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">334</span>         P_GcmStatsProperties.scenario scenario = ds.getScenario(scenarioName);
+<span class="line-number">335</span> 
+<span class="line-number">336</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">337</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, <span class="keyword-directive">null</span>, scenario, stat, fyear, tyear);
+<span class="line-number">338</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span> || scenario == <span class="keyword-directive">null</span>) {
+<span class="line-number">339</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">340</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">341</span>         }
+<span class="line-number">342</span>         config.setAreaId(areaId);
+<span class="line-number">343</span> <span class="comment">//        List&lt;GcmDat</span><span class="comment">um&gt; gcms = P_GcmConfigAreaDao.get().getAllGcmAreaData(config, agg.isIsAnnual());</span>
+<span class="line-number">344</span> <span class="comment">//        String formattedData = DataFormatHelper.formatGcms(format, gcms);</span>
+<span class="line-number">345</span>         List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">346</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">347</span> 
+<span class="line-number">348</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">349</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">350</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">351</span>     }
+<span class="line-number">352</span> 
+<span class="line-number">353</span> 
+<span class="line-number">354</span> 
+<span class="line-number">355</span> 
+<span class="line-number">356</span>     <span class="keyword-directive">public</span> Response getSingleGcmData(
+<span class="line-number">357</span>             String gcmName,
+<span class="line-number">358</span>             String statName,
+<span class="line-number">359</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">360</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">361</span>             <span class="keyword-directive">int</span> areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">362</span> 
+<span class="line-number">363</span> 
+<span class="line-number">364</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">365</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">366</span>         P_GcmStatsProperties.gcm gcm = ds.getGcm(gcmName);
+<span class="line-number">367</span> 
+<span class="line-number">368</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">369</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, gcm, <span class="keyword-directive">null</span>, stat, fyear, tyear);
+<span class="line-number">370</span>         <span class="keyword-directive">if</span> (stat == <span class="keyword-directive">null</span> || statType == <span class="keyword-directive">null</span> || gcm == <span class="keyword-directive">null</span>) {
+<span class="line-number">371</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">372</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">373</span>         }
+<span class="line-number">374</span>         config.setAreaId(areaId);
+<span class="line-number">375</span>         List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isAnnual);
+<span class="line-number">376</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">377</span> 
+<span class="line-number">378</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">379</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">380</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">381</span>     }
+<span class="line-number">382</span> 
+<span class="line-number">383</span>     <span class="comment">/**</span>
+<span class="line-number">384</span> <span class="comment">     *  </span><span class="comment">L1</span>
+<span class="line-number">385</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">gcmName</span>
+<span class="line-number">386</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">scenarioName</span>
+<span class="line-number">387</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">388</span>     <span class="comment"> * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">389</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">390</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">iso3</span>
+<span class="line-number">391</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">format</span>
+<span class="line-number">392</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">393</span>      <span class="comment">*/</span>
+<span class="line-number">394</span>     <span class="keyword-directive">public</span> Response getGcmScenario(
+<span class="line-number">395</span>             String gcmName,
+<span class="line-number">396</span>             String scenarioName,
+<span class="line-number">397</span>             String statName,
+<span class="line-number">398</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">399</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">400</span>             <span class="keyword-directive">int</span>  areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">401</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">402</span>         P_GcmStatsProperties.climatestat stat = ds.getClimateStat(statName);
+<span class="line-number">403</span>         P_GcmStatsProperties.gcm gcm = ds.getGcm(gcmName);
+<span class="line-number">404</span>         P_GcmStatsProperties.scenario scenario = ds.getScenario(scenarioName);
+<span class="line-number">405</span> 
+<span class="line-number">406</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">407</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, gcm, scenario, stat, fyear, tyear);
+<span class="line-number">408</span>         <span class="keyword-directive">if</span> (!config.isCompleteIgnoringAreaValueMonth()) {
+<span class="line-number">409</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">410</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">411</span>         }
+<span class="line-number">412</span>         config.setAreaId(areaId);
+<span class="line-number">413</span>         List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">414</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">415</span> 
+<span class="line-number">416</span> <span class="comment">//        HashMap&lt;Integer, Double&gt; data = P_GcmConfig</span><span class="comment">AreaDao.get().getAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">417</span> <span class="comment">//        String formattedData = DataFormatHelper.formatMonthlyOrAnnualMap(format, data);</span>
+<span class="line-number">418</span> 
+<span class="line-number">419</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">420</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">421</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">422</span>     }
+<span class="line-number">423</span> 
+<span class="line-number">424</span>      <span class="comment">/**</span>
+<span class="line-number">425</span> <span class="comment">     *  </span><span class="comment">L1</span>
+<span class="line-number">426</span> <span class="comment">     * </span><span class="ST0">@par</span><span class="ST0">am</span> <span class="comment">gcmName</span>
+<span class="line-number">427</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">scenarioName</span>
+<span class="line-number">428</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">429</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">430</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">431</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">iso3</span>
+<span class="line-number">432</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">forma</span><span class="comment">t</span>
+<span class="line-number">433</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">434</span>      <span class="comment">*/</span>
+<span class="line-number">435</span>     <span class="keyword-directive">public</span> Response getGcmScenarioAllVariables(
+<span class="line-number">436</span>             String gcmName,
+<span class="line-number">437</span>             String scenarioName,
+<span class="line-number">438</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">439</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">440</span>             <span class="keyword-directive">int</span>  areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">441</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">442</span>         P_GcmStatsProperties.gcm gcm = ds.getGcm(gcmName);
+<span class="line-number">443</span>         P_GcmStatsProperties.scenario scenario = ds.getScenario(scenarioName);
+<span class="line-number">444</span> 
+<span class="line-number">445</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">446</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, gcm, scenario, <span class="keyword-directive">null</span>, fyear, tyear);
+<span class="line-number">447</span>         <span class="keyword-directive">if</span> (gcm == <span class="keyword-directive">null</span> || scenario == <span class="keyword-directive">null</span>) {
+<span class="line-number">448</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">449</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">450</span>         }
+<span class="line-number">451</span>         config.setAreaId(areaId);
+<span class="line-number">452</span>         List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">453</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">454</span> 
+<span class="line-number">455</span> <span class="comment">//        HashMap&lt;Integer, Double&gt; data = P_GcmConfig</span><span class="comment">AreaDao.get().getAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">456</span> <span class="comment">//        String formattedData = DataFormatHelper.formatMonthlyOrAnnualMap(format, data);</span>
+<span class="line-number">457</span> 
+<span class="line-number">458</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">459</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">460</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">461</span>     }
+<span class="line-number">462</span> 
+<span class="line-number">463</span>     <span class="keyword-directive">public</span> Response.ResponseBuilder getProperResponse(String formattedData, Delivery delivery, String format){
+<span class="line-number">464</span>         Response.ResponseBuilder r;
+<span class="line-number">465</span>         <span class="keyword-directive">if</span> (delivery.equals(Delivery.WEB)) {
+<span class="line-number">466</span>             r = Response.ok(formattedData, format);
+<span class="line-number">467</span>         } <span class="keyword-directive">else</span> {
+<span class="line-number">468</span>             String extension = <span class="keyword-directive">null</span>;
+<span class="line-number">469</span>             <span class="keyword-directive">if</span>(format.equals(MediaType.TEXT_PLAIN)){
+<span class="line-number">470</span>                 extension = <span class="character">&quot;</span><span class="character">.csv</span><span class="character">&quot;</span>;
+<span class="line-number">471</span>             }<span class="keyword-directive">else</span> <span class="keyword-directive">if</span>(format.equals(MediaType.APPLICATION_XML)){
+<span class="line-number">472</span>                 extension = <span class="character">&quot;</span><span class="character">.xml</span><span class="character">&quot;</span>;
+<span class="line-number">473</span>             }<span class="keyword-directive">else</span>{
+<span class="line-number">474</span>                 extension = <span class="character">&quot;</span><span class="character">.txt</span><span class="character">&quot;</span>;
+<span class="line-number">475</span>             }
+<span class="line-number">476</span>             r = Response.ok(formattedData, format).header(<span class="character">&quot;</span><span class="character">Content-Disposition</span><span class="character">&quot;</span>, <span class="character">&quot;</span><span class="character">attachement; filename=download</span><span class="character">&quot;</span> + extension);
+<span class="line-number">477</span>         }
+<span class="line-number">478</span>         <span class="keyword-directive">return</span> r;
+<span class="line-number">479</span>     }
+<span class="line-number">480</span> 
+<span class="line-number">481</span>      <span class="comment">/**</span>
+<span class="line-number">482</span> <span class="comment">     *  </span><span class="comment">L1</span>
+<span class="line-number">483</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">gcmName</span>
+<span class="line-number">484</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">scenarioName</span>
+<span class="line-number">485</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">statName</span>
+<span class="line-number">486</span>  <span class="comment">    * </span><span class="ST0">@param</span> <span class="comment">fyear</span>
+<span class="line-number">487</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">tyear</span>
+<span class="line-number">488</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">iso3</span>
+<span class="line-number">489</span> <span class="comment">     * </span><span class="ST0">@param</span> <span class="comment">format</span>
+<span class="line-number">490</span> <span class="comment">     * </span><span class="ST0">@return</span>
+<span class="line-number">491</span>      <span class="comment">*/</span>
+<span class="line-number">492</span>     <span class="keyword-directive">public</span> Response getGcmAllVariables(
+<span class="line-number">493</span>             String gcmName,
+<span class="line-number">494</span>             <span class="keyword-directive">int</span> fyear,
+<span class="line-number">495</span>             <span class="keyword-directive">int</span> tyear,
+<span class="line-number">496</span>             <span class="keyword-directive">int</span>  areaId, stat_type statType, TempAgg agg, String format, Delivery delivery) {
+<span class="line-number">497</span>         P_GcmStatsProperties ds = P_GcmStatsProperties.getInstance();
+<span class="line-number">498</span>         P_GcmStatsProperties.gcm gcm = ds.getGcm(gcmName);
+<span class="line-number">499</span> 
+<span class="line-number">500</span>         <span class="comment">//@TODO validate the config here</span>
+<span class="line-number">501</span>         P_GcmConfig config = <span class="keyword-directive">new</span> P_GcmConfig(statType, gcm, <span class="keyword-directive">null</span>, <span class="keyword-directive">null</span>, fyear, tyear);
+<span class="line-number">502</span>         <span class="keyword-directive">if</span> (gcm == <span class="keyword-directive">null</span> ) {
+<span class="line-number">503</span>             String errorResponse = DataFormatHelper.formatData(format, ResponseConstants.INVALID_PARAMS);
+<span class="line-number">504</span>             <span class="keyword-directive">return</span> Response.ok(errorResponse, format).build();
+<span class="line-number">505</span>         }
+<span class="line-number">506</span>         config.setAreaId(areaId);
+<span class="line-number">507</span>         List&lt;GcmDatum&gt; gcms = P_GcmConfigAreaDao.get().getGcmData(config, agg.isIsAnnual());
+<span class="line-number">508</span>         String formattedData = DataFormatHelper.formatGcms(format, gcms);
+<span class="line-number">509</span> 
+<span class="line-number">510</span> <span class="comment">//        HashMap&lt;Integer, Double&gt; data = P_GcmConfig</span><span class="comment">AreaDao.get().getAreaDataForTime(config, agg.isIsAnnual());</span>
+<span class="line-number">511</span> <span class="comment">//        String formattedData = DataFormatHelper.formatMonthlyOrAnnualMap(format, data);</span>
+<span class="line-number">512</span> 
+<span class="line-number">513</span>          Response.ResponseBuilder r = <span class="keyword-directive">null</span>;
+<span class="line-number">514</span>         r = getProperResponse(formattedData, delivery, format);
+<span class="line-number">515</span>         <span class="keyword-directive">return</span> r.build();
+<span class="line-number">516</span>     }
+<span class="line-number">517</span> }
+<span class="line-number">518</span> 
+<span class="line-number">519</span> 
+</pre></body>
+</html>

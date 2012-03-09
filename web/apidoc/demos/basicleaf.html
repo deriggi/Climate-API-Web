@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Leaflet GeoJSON example</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="../../css/leaflet.css" />
+        <!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.ie.css" /><![endif]-->
+
+        <script src="../../js/leaflet.js"></script>
+        <!--<script src="../debug/leaflet-include.js"></script>-->
+        <script src="../../data/basicleaf.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div id="map" style="width: 600px; height: 400px"></div>
+
+        <script>
+            var map = new L.Map('map');
+
+            var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/22677/256/{z}/{x}/{y}.png',
+            cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+            cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution});
+
+            map.setView(new L.LatLng(1.5000000000000995, -77), 4).addLayer(cloudmade);
+
+
+            var numberOfLayers = 10;
+            var someLayers = makeLayers(numberOfLayers);
+            
+            var i = 0;
+            while(i < numberOfLayers){
+                map.addLayer(someLayers[i]);
+                someLayers[i].addGeoJSON(allClasses[i]);
+                i++;
+            }
+            
+            //            
+            
+            // draw a map
+            // create a layer for each class
+            // then 1) make an ajax call for the class data or 2) just write a custom import
+                
+                
+        </script>
+    </body>
+</html>

@@ -4,7 +4,8 @@
  */
 //var cnrmPaper, gfdlcm20Paper, gfdlcm21Paper, miroc3_2_medres;
 var papers = {};
-var colors = ["#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5" ]
+//var colors = ["#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5" ]
+var colors = ["#FEE5D9", "#FCBBA1", "#FC9272", "#FB6A4A", "#EF3B2C", "#CB181D" ]
 
 
 function getSvgs(iso3,month,gcm,scenario, climatestat){
@@ -57,7 +58,15 @@ function initRaphaels(){
     
     papers["gfdl_cm2_1"] = Raphael(document.getElementById("gfdl_cm2_1"));
 
-    papers["miroc3_2_medres"] = Raphael(document.getElementById("miroc3_2_medres"));
+    papers["miub_echo_g"] = Raphael(document.getElementById("miub_echo_g"));
+
+    papers["mpi_echam5"] = Raphael(document.getElementById("mpi_echam5"));
+
+    papers["cccma_cgcm3_1"] = Raphael(document.getElementById("cccma_cgcm3_1"));
+
+    papers["mri_cgcm2_3_2a"] = Raphael(document.getElementById("mri_cgcm2_3_2a"));
+
+    papers["ipsl_cm4"] = Raphael(document.getElementById("ipsl_cm4"));
     
 
 }
