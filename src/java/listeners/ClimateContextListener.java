@@ -1,5 +1,6 @@
 package listeners;
 
+import cru.precip.GeometryCruCsvWriterRunner;
 import database.DBUtils;
 import domain.DerivativeStats;
 import java.sql.Driver;
@@ -34,6 +35,7 @@ public class ClimateContextListener implements ServletContextListener {
             P_GcmStatsProperties.getInstance();
             DerivativeStats.getInstance();
             CountryService.get();
+            GeometryCruCsvWriterRunner.init();
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

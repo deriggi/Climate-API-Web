@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Columbia Climate Data</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="css/leaflet.css" />
+<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+<!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.ie.css" /><![endif]-->
+
+<!-- latest jQuery direct from google's CDN -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="js/leaflet.js"></script>
+<script type="text/javascript" src="js/jquery.tinyscrollbar.min.js"></script>
+<!--<script src="../debug/leaflet-include.js"></script>-->
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="data/basicleaf.js" type="text/javascript"></script>
+<style>
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+.scroll-pane {
+	width: 220px;
+	height: 80%;
+	overflow: auto;
+}
+</style>
+
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+<script type="text/javascript" >
+			$(function()
+			{
+				$('.scroll-pane').tinyscrollbar();
+			});
+		</script>
+</head>
+
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a>
+      <div class="nav-collapse">
+        <table >
+          <tr style="height:40px;"	>
+            <td style = 'color:white; padding:3px;'>Temperature &#8451; </td>
+            <td style = 'background-color:rgb(5,48,97); color:white; padding:3px;'>10.60 - </td>
+            <td style = 'background-color:rgb(5,48,97); color:white; padding:3px;'>12.50</td>
+            <td style = 'background-color:rgb(33,102,172); color:white; padding:3px;'>12.50 - </td>
+            <td style = 'background-color:rgb(33,102,172); color:white; padding:3px;'>14.40</td>
+            <td style = 'background-color:rgb(67,147,195); padding:3px;'>14.40 - </td>
+            <td style = 'background-color:rgb(67,147,195); padding:3px;'>16.30</td>
+            <td style = 'background-color:rgb(146,197,222); padding:3px;'>16.30 - </td>
+            <td style = 'background-color:rgb(146,197,222); padding:3px;'>18.20</td>
+            <td style = 'background-color:rgb(209,229,240); padding:3px;'>18.20 - </td>
+            <td style = 'background-color:rgb(209,229,240); padding:3px;'>20.10</td>
+            <td style = 'background-color:rgb(247,247,247); padding:3px;'>20.10 - </td>
+            <td style = 'background-color:rgb(247,247,247); padding:3px;'>22.00</td>
+            <td style = 'background-color:rgb(253,219,199); padding:3px;'>22.00 - </td>
+            <td style = 'background-color:rgb(253,219,199); padding:3px;'>23.90</td>
+            <td style = 'background-color:rgb(244,165,130); padding:3px;'>23.90 - </td>
+            <td style = 'background-color:rgb(244,165,130); padding:3px;'>25.80</td>
+            <td style = 'background-color:rgb(214,96,77);color:white; padding:3px;'>25.80 - </td>
+            <td style = 'background-color:rgb(214,96,77);color:white; padding:3px;'>27.70</td>
+            <td style = 'background-color:rgb(178,24,43);color:white; padding:3px;'>27.70 - </td>
+            <td style = 'background-color:rgb(178,24,43);color:white; padding:3px;'>29.60</td>
+          </tr>
+        </table>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+  </div>
+</div>
+<div class ="row">
+  <div class =" span3 " style="border-color:#dddddd; border-width: 1px; border-style: solid;padding:4px; background:whitesmoke; position:fixed; left: 74%; margin-top:30px;  width:100px">
+    <p><a href="#Jan">January</a></p>
+    <p><a href="#Feb">February </a></p>
+    <p><a href="#Mar">March </a></p>
+    <p><a href="#Apr">April </a></p>
+    <p><a href="#May">May </a></p>
+    <p><a href="#Jun">June </a></p>
+    <p><a href="#Jul">July </a></p>
+    <p><a href="#Aug">August </a></p>
+    <p><a href="#Sep">September </a></p>
+    <p><a href="#Oct">October</a></p>
+    <p><a href="#Nov">November</a></p>
+    <p><a href="#Dec">December </a></p>
+  </div>
+  <div class='span2 scroll-pane' style=" position:fixed; left: 54%; margin-top:5px;">
+    <h3>January</h3>
+    
+    <ul class='thumbnails' >
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1970_1.asc.png'/>
+          <div class='caption'>
+            <p>1970</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1971_1.asc.png'/>
+          <div class='caption'>
+            <p>1971</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1972_1.asc.png'/>
+          <div class='caption'>
+            <p>1972</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1973_1.asc.png'/>
+          <div class='caption'>
+            <p>1973</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1974_1.asc.png'/>
+          <div class='caption'>
+            <p>1974</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1975_1.asc.png'/>
+          <div class='caption'>
+            <p>1975</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1976_1.asc.png'/>
+          <div class='caption'>
+            <p>1976</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1977_1.asc.png'/>
+          <div class='caption'>
+            <p>1977</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1978_1.asc.png'/>
+          <div class='caption'>
+            <p>1978</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1979_1.asc.png'/>
+          <div class='caption'>
+            <p>1979</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1980_1.asc.png'/>
+          <div class='caption'>
+            <p>1980</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1981_1.asc.png'/>
+          <div class='caption'>
+            <p>1981</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1982_1.asc.png'/>
+          <div class='caption'>
+            <p>1982</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1983_1.asc.png'/>
+          <div class='caption'>
+            <p>1983</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1984_1.asc.png'/>
+          <div class='caption'>
+            <p>1984</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1985_1.asc.png'/>
+          <div class='caption'>
+            <p>1985</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1986_1.asc.png'/>
+          <div class='caption'>
+            <p>1986</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1987_1.asc.png'/>
+          <div class='caption'>
+            <p>1987</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1988_1.asc.png'/>
+          <div class='caption'>
+            <p>1988</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1989_1.asc.png'/>
+          <div class='caption'>
+            <p>1989</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1990_1.asc.png'/>
+          <div class='caption'>
+            <p>1990</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1991_1.asc.png'/>
+          <div class='caption'>
+            <p>1991</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1992_1.asc.png'/>
+          <div class='caption'>
+            <p>1992</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1993_1.asc.png'/>
+          <div class='caption'>
+            <p>1993</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1994_1.asc.png'/>
+          <div class='caption'>
+            <p>1994</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1995_1.asc.png'/>
+          <div class='caption'>
+            <p>1995</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1996_1.asc.png'/>
+          <div class='caption'>
+            <p>1996</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1997_1.asc.png'/>
+          <div class='caption'>
+            <p>1997</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1998_1.asc.png'/>
+          <div class='caption'>
+            <p>1998</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_1999_1.asc.png'/>
+          <div class='caption'>
+            <p>1999</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2000_1.asc.png'/>
+          <div class='caption'>
+            <p>2000</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2001_1.asc.png'/>
+          <div class='caption'>
+            <p>2001</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2002_1.asc.png'/>
+          <div class='caption'>
+            <p>2002</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2003_1.asc.png'/>
+          <div class='caption'>
+            <p>2003</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2004_1.asc.png'/>
+          <div class='caption'>
+            <p>2004</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2005_1.asc.png'/>
+          <div class='caption'>
+            <p>2005</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2006_1.asc.png'/>
+          <div class='caption'>
+            <p>2006</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2007_1.asc.png'/>
+          <div class='caption'>
+            <p>2007</p>
+          </div>
+        </div>
+      </li>
+      <li class='span2'>
+        <div class='thumbnail'><img src='cruimages/cru_ts_3_10.1901.2009.tmp_2008_1.asc.png'/>
+          <div class='caption'>
+            <p>2008</p>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="container">
+  <h1>Columbia Temperature Maps in <span>&#8451;</span></h1>
+  <p>Temperature maps derived from CRU data. Grid cells are 0.5 degrees x 0.5 degrees</p>
+  <div class='row' > </div>
+</div>
+
+<!-- /container --> 
+
+<!-- Le javascript
+    ================================================== --> 
+<!-- Placed at the end of the document so the pages load faster
+    <script src="bootstrap/js/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <script src="bootstrap/js/bootstrap-alert.js"></script>
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    <script src="bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="bootstrap/js/bootstrap-tab.js"></script>
+    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="bootstrap/js/bootstrap-popover.js"></script>
+    <script src="bootstrap/js/bootstrap-button.js"></script>
+    <script src="bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="bootstrap/js/bootstrap-typeahead.js"></script> -->
+
+</body>
+</html>
